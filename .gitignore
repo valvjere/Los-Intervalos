@@ -1,0 +1,22 @@
+# Estado y temporales de R
+.Rproj.user/
+.Rhistory
+.RData
+.RDataTmp
+.Ruserdata
+Rplots.pdf
+
+# macOS
+.DS_Store
+
+# Datos
+*.sav
+*.rds
+
+# Resultados generados
+Resultados_Etapa3/
+Boxplot_Ingresos.png
+
+# Configuración privada
+.env
+.Renviron
