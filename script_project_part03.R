@@ -1,4 +1,12 @@
-# Estadísticas descriptivas por nivel educativo
+# ETAPA 3 | Análisis exploratorio de la brecha de ingresos
+# Requisitos: objeto `datos` preparado en las etapas anteriores y paquetes
+# dplyr, ggplot2 y readr cargados; scales se utiliza mediante su namespace.
+# Columnas: Educacion, Ingreso_principal, Horas_trabajadas, Sexo y Zona.
+# Los resultados no aplican ponderadores y se guardan en el directorio de trabajo.
+
+# 1. Resumen por nivel educativo ---------------------------------------------
+# n() cuenta todas las filas del grupo, incluso si falta el ingreso; las otras
+# estadísticas omiten ingresos NA. El conteo no representa personas únicas.
 resumen <- datos %>%
   group_by(Educacion) %>%
   summarise(
@@ -6,13 +14,20 @@ resumen <- datos %>%
     Media = mean(Ingreso_principal, na.rm = TRUE),
     Mediana = median(Ingreso_principal, na.rm = TRUE),
     Desviacion_estandar = sd(Ingreso_principal, na.rm = TRUE),
+    # Devuelve una tabla sin agrupación para su uso posterior.
     .groups = "drop"
   )
 print(resumen)
 
 
+# Exporta las cifras sin redondear; el informe presenta valores redondeados.
 write_csv(resumen, "Tabla_Descriptiva.csv")
 
+# 2. Distribución del ingreso por educación ---------------------------------
+# La caja resume el centro y la dispersión; los puntos fuera de los bigotes
+# son valores atípicos según el boxplot, no necesariamente errores.
+# log10 requiere ingresos positivos: verificar ceros y negativos en la base.
+# La transformación ocurre antes del cálculo estadístico del boxplot.
 grafico <- ggplot(
   datos,
   aes(x = Educacion, y = Ingreso_principal, fill = Educacion)
@@ -28,6 +43,7 @@ grafico <- ggplot(
   theme_minimal() +
   theme(legend.position = "none")
 
+# Exporta el gráfico explícito a 300 dpi; width y height se expresan en pulgadas.
 ggsave(
   "Boxplot_Ingresos.png",
   plot = grafico,
@@ -37,7 +53,9 @@ ggsave(
 )
 
 
-# Relación entre horas e ingreso
+# 3. Relación entre horas e ingreso -----------------------------------------
+# Cada punto representa una observación. La transparencia reduce la saturación
+# en zonas con superposición; los colores distinguen los niveles educativos.
 grafico_horas <- ggplot(
   datos,
   aes(
@@ -62,7 +80,9 @@ ggsave(
   width = 10, height = 6, dpi = 300
 )
 
-# Comparación por sexo: reutiliza el boxplot general
+# 4. Comparación por sexo ---------------------------------------------------
+# Reutiliza el gráfico general y crea un panel por sexo. facet_wrap conserva
+# escalas comunes de forma predeterminada para facilitar la comparación.
 grafico_sexo <- grafico +
   facet_wrap(~Sexo) +
   labs(title = "Ingreso por nivel educativo y sexo")
@@ -73,7 +93,9 @@ ggsave(
   width = 10, height = 6, dpi = 300
 )
 
-# Comparación por zona
+# 5. Comparación por zona ---------------------------------------------------
+# Mantiene el diseño y la escala del gráfico general en los paneles de zona.
+# Estas comparaciones son descriptivas y no controlan por otras variables.
 grafico_zona <- grafico +
   facet_wrap(~Zona) +
   labs(title = "Ingreso por nivel educativo y zona")
