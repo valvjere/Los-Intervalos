@@ -19,3 +19,7 @@ Resultados_Etapa3/
 # Configuración privada
 .env
 .Renviron
+
+# Datos procesados intermedios
+data/procesados/
+
