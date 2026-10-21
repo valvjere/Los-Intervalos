@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Limpieza de Datos - CI-0115 Probabilidad y Estadística</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --primary-bg: #eff6ff;
+            --secondary: #0f766e;
+            --accent: #d97706;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --success: #16a34a;
+            --warning: #ca8a04;
+            --danger: #dc2626;
+            --radius: 10px;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0369a1 100%);
+            color: white;
+            padding: 40px 20px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .badge-course {
+            display: inline-block;
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 15px;
+        }
+
+        .meta-item {
+            font-size: 0.9rem;
+        }
+
+        .meta-item strong {
+            display: block;
+            color: #93c5fd;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: -25px auto 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: white;
+            padding: 8px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            gap: 6px;
+            overflow-x: auto;
+            position: sticky;
+            top: 15px;
+            z-index: 100;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+            background-color: var(--primary-bg);
+        }
+
+        .tab-btn.active {
+            color: white;
+            background-color: var(--primary);
+        }
+
+        /* Tab Content */
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Member Grid */
+        .member-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .member-card {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .member-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .member-header {
+            padding: 16px 20px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .member-card.ignacio .member-header { background: linear-gradient(135deg, #1e3a8a, #2563eb); }
+        .member-card.jeremy .member-header { background: linear-gradient(135deg, #0f766e, #0d9488); }
+        .member-card.lucas .member-header { background: linear-gradient(135deg, #b45309, #d97706); }
+        .member-card.daniel .member-header { background: linear-gradient(135deg, #4338ca, #6366f1); }
+
+        .member-name {
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+        }
+
+        .member-role {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .member-body {
+            padding: 18px 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-list {
+            list-style: none;
+            font-size: 0.9rem;
+        }
+
+        .task-list li {
+            position: relative;
+            padding-left: 22px;
+            margin-bottom: 8px;
+        }
+
+        .task-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .template-section-tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* Step Timeline */
+        .step-timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 15px;
+        }
+
+        .step-timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 11px;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .step-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .step-node {
+            position: absolute;
+            left: -30px;
+            top: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            box-shadow: 0 0 0 4px white;
+        }
+
+        .step-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .step-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .step-desc {
+            font-size: 0.92rem;
+            color: var(--text-main);
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--dark);
+            font-weight: 700;
+            padding: 12px 14px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        .badge-teal { background: #ccfbf1; color: #0f766e; }
+        .badge-amber { background: #fef3c7; color: #92400e; }
+        .badge-purple { background: #ede9fe; color: #5b21b6; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+
+        /* Code Block */
+        pre {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            margin: 12px 0;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: inherit;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            color: #94a3b8;
+            padding: 6px 14px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .code-container {
+            margin: 15px 0;
+        }
+
+        .code-container pre {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            margin-top: 0;
+        }
+
+        /* Checkbox lists */
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .check-item input[type="checkbox"] {
+            margin-top: 4px;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+        }
+
+        .check-item label {
+            cursor: pointer;
+            font-size: 0.92rem;
+        }
+
+        .check-item.done label {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* Callouts */
+        .callout {
+            border-left: 4px solid var(--primary-light);
+            background-color: var(--primary-bg);
+            padding: 14px 18px;
+            border-radius: 0 6px 6px 0;
+            margin: 15px 0;
+            font-size: 0.92rem;
+        }
+
+        .callout-warning {
+            border-left-color: var(--accent);
+            background-color: #fffbeb;
+        }
+
+        .callout-success {
+            border-left-color: var(--success);
+            background-color: #f0fdf4;
+        }
+
+        .callout-danger {
+            border-left-color: var(--danger);
+            background-color: #fef2f2;
+        }
+
+        .callout strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.6rem; }
+            .nav-tabs { flex-wrap: nowrap; }
+            .card { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <span class="badge-course">CI-0115 Probabilidad y Estadística • ECCI • UCR</span>
+            <h1>Plan Estratégico de Limpieza de Datos</h1>
+            <p class="subtitle">
+                Guía colaborativa paso a paso para el análisis de la brecha salarial por nivel educativo, sexo y edad en el mercado laboral costarricense (ECE 2024-2025).
+            </p>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <strong>Población Objetivo</strong>
+                    Personas ocupadas (18 a 65 años)
+                </div>
+                <div class="meta-item">
+                    <strong>Fuente de Datos</strong>
+                    INEC - Encuesta Continua de Empleo
+                </div>
+                <div class="meta-item">
+                    <strong>Referencia Metodológica</strong>
+                    T5_Estadistica_LimpiezaDatos.pdf (10 Técnicas)
+                </div>
+                <div class="meta-item">
+                    <strong>Plantilla de Entrega</strong>
+                    CI0115_PlantillaProyecto_LimpiezaDatos.docx
+                </div>
+            
+                <div class="callout callout-warning" style="margin-top: 15px;">
+                    <strong>⚠️ Estructura del Repositorio Git (Los-Intervalos):</strong>
+                    <ul style="margin-left: 20px; margin-top: 6px; font-size: 0.9rem;">
+                        <li><code>data/</code>: Contiene exclusivamente los 8 microdatos oficiales <code>.sav</code> (I a IV Trimestre 2024 y 2025).</li>
+                        <li><code>info/</code>: Contiene el diccionario de variables oficial (<code>VariablesEncuestaEmpleo.xlsx</code>).</li>
+                        <li><code>tr/</code>: <strong>IGNORAR AL 100%</strong>. Es material obsoleto de un compañero que no debe utilizarse en este trabajo.</li>
+                    </ul>
+                </div>
+
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Barra de Pestañas -->
+        <nav class="nav-tabs" id="mainTabs">
+            <button class="tab-btn active" onclick="switchTab('tab-roles')">👥 Asignación por Integrante</button>
+            <button class="tab-btn" onclick="switchTab('tab-pasos')">📋 Flujo Paso a Paso</button>
+            <button class="tab-btn" onclick="switchTab('tab-tecnicas')">⚙️ 10 Técnicas T5 (100%)</button>
+            <button class="tab-btn" onclick="switchTab('tab-plantilla')">📄 Guía Plantilla Word</button>
+            <button class="tab-btn" onclick="switchTab('tab-codigo')">💻 Código R / Python</button>
+            <button class="tab-btn" onclick="switchTab('tab-checklist')">✅ Checklist de Entrega</button>
+        </nav>
+
+        <!-- ==================== PESTAÑA 1: ASIGNACIÓN POR INTEGRANTE ==================== -->
+        <div id="tab-roles" class="tab-pane active">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Matriz de Responsabilidades y Roles del Equipo (4 Personas)</h2>
+                </div>
+                <p style="margin-bottom: 20px;">
+                    Para asegurar un trabajo equilibrado y coherente con las 10 técnicas del PDF del curso y la plantilla oficial, el trabajo se divide de forma modular. Cada integrante es dueño de un bloque técnico en el script y de la redacción de sus secciones correspondientes en la plantilla Word.
+                </p>
+
+                <div class="member-grid">
+                    <!-- Ignacio -->
+                    <div class="member-card ignacio">
+                        <div class="member-header">
+                            <div class="member-name">Ignacio (Tú)</div>
+                            <div class="member-role">Coordinador & Arquitectura de Datos</div>
+                        </div>
+                        <div class="member-body">
+                            <span class="badge badge-blue">Técnicas 3 y 9 de T5</span>
+                            <ul class="task-list">
+                                <li><strong>Ingesta & Fusión:</strong> Cargar y fusionar los 8 trimestres (.sav) de 2024 y 2025.</li>
+                                <li><strong>Reducción de Dimensionalidad:</strong> Filtrar de las 394 columnas iniciales a las variables analíticas indispensables.</li>
+                                <li><strong>Filtrado de Duplicados:</strong> Identificar y remover duplicados exactos y basados en llaves compuestas de vivienda/hogar/persona.</li>
+                                <li><strong>Integración Global:</strong> Control de versiones del código (Git) y ensamble final del informe PDF.</li>
+                            </ul>
+                            <div style="margin-top: auto;">
+                                <div class="template-section-tag">Word: Secc. 1 (Info General)</div>
+                                <div class="template-section-tag">Word: Secc. 4 (Herramientas)</div>
+                                <div class="template-section-tag">Word: Tabla (Duplicados, Dimens.)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Jeremy -->
+                    <div class="member-card jeremy">
+                        <div class="member-header">
+                            <div class="member-name">Jeremy</div>
+                            <div class="member-role">Especialista en Consistencia & Tipos</div>
+                        </div>
+                        <div class="member-body">
+                            <span class="badge badge-teal">Técnicas 4 y 8 de T5</span>
+                            <ul class="task-list">
+                                <li><strong>Filtrado Poblacional:</strong> Delimitar la muestra a ocupados (Condicion_actividad == 1), edad entre 18 y 65 años, y sexo Hombre/Mujer.</li>
+                                <li><strong>Tipos de Datos:</strong> Conversión y validación estricta de tipos (factores, numéricos continuos, enteros).</li>
+                                <li><strong>Incoherencias Lógicas:</strong> Detección de cruces incompatibles (ej. edad mínima vs título universitario, salario neto > bruto, horas trabajadas incoherentes).</li>
+                                <li><strong>Auditoría de Reglas:</strong> Justificar en el informe cada descarte por incoherencia lógica.</li>
+                            </ul>
+                            <div style="margin-top: auto;">
+                                <div class="template-section-tag">Word: Secc. 3 (Tipos & Incoherencias)</div>
+                                <div class="template-section-tag">Word: Tabla (Formatos, Incoherencias)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lucas -->
+                    <div class="member-card lucas">
+                        <div class="member-header">
+                            <div class="member-name">Lucas</div>
+                            <div class="member-role">Especialista en Faltantes & Categorías</div>
+                        </div>
+                        <div class="member-body">
+                            <span class="badge badge-amber">Técnicas 1, 2 y 7 de T5</span>
+                            <ul class="task-list">
+                                <li><strong>Manejo de Faltantes:</strong> Detectar y tratar valores nulos y códigos especiales de no respuesta (ej. 99999999 "No especificado" o 0 en ingresos).</li>
+                                <li><strong>Tasa de No Respuesta:</strong> Cuantificar la pérdida de información en ingresos y sustentar la exclusión/imputación.</li>
+                                <li><strong>Corrección Tipográfica:</strong> Homogeneización de etiquetas textuales, acentos y nombres de categorías.</li>
+                                <li><strong>Codificación Categórica:</strong> Ordenamiento ordinal de <code>Nivel_educativo</code> y binarización de <code>Sexo</code>.</li>
+                            </ul>
+                            <div style="margin-top: auto;">
+                                <div class="template-section-tag">Word: Secc. 3 (Faltantes, Tipografía, Codif.)</div>
+                                <div class="template-section-tag">Word: Tabla (Faltantes, Errores, Categ.)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Daniel -->
+                    <div class="member-card daniel">
+                        <div class="member-header">
+                            <div class="member-name">Daniel</div>
+                            <div class="member-role">Especialista en Outliers & Validación</div>
+                        </div>
+                        <div class="member-body">
+                            <span class="badge badge-purple">Técnicas 5, 6 y 10 de T5</span>
+                            <ul class="task-list">
+                                <li><strong>Detección de Atípicos:</strong> Análisis de outliers en ingresos netos mediante Rango Intercuartílico (IQR), Z-Score y boxplots.</li>
+                                <li><strong>Normalización & Escalado:</strong> Transformación logarítmica de ingresos (<code>log(ingreso)</code>) para corregir la fuerte asimetría positiva.</li>
+                                <li><strong>Validación con Dominio Experto:</strong> Comparar promedios salariales con las series oficiales del INEC (archivos seempleoece*.xlsx).</li>
+                                <li><strong>Resultado Final & Citas:</strong> Redactar comparación antes vs después, cálculo de retención y bibliografía APA/IEEE.</li>
+                            </ul>
+                            <div style="margin-top: auto;">
+                                <div class="template-section-tag">Word: Secc. 5 (Resultado Final)</div>
+                                <div class="template-section-tag">Word: Secc. 6 (Referencias APA)</div>
+                                <div class="template-section-tag">Word: Tabla (Atípicos, Escalado)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="callout callout-success">
+                    <strong>Principio de Trabajo en Parejas / Revisión Cruzada:</strong>
+                    Para garantizar cero discrepancias: Ignacio revisa el trabajo de Lucas, Lucas revisa a Ignacio; Jeremy revisa a Daniel, Daniel revisa a Jeremy. Toda modificación de código se ejecuta sobre el repositorio común.
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PESTAÑA 2: FLUJO PASO A PASO ==================== -->
+        <div id="tab-pasos" class="tab-pane">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Flujo de Trabajo Paso a Paso (Pipeline Metodológico)</h2>
+                </div>
+
+                <div class="step-timeline">
+                    <!-- Paso 1 -->
+                    <div class="step-item">
+                        <div class="step-node">1</div>
+                        <div class="step-title">Paso 1: Configuración del Entorno & Carga de Datos</div>
+                        <div class="step-meta">Responsable Principal: <strong>Ignacio</strong> | Apoyo: Todos</div>
+                        <div class="step-desc">
+                            <ul>
+                                <li>Crear el repositorio o carpeta compartida de trabajo.</li>
+                                <li>Definir la herramienta oficial: <strong>R (RStudio)</strong> con <code>tidyverse</code> y <code>haven</code>, o <strong>Python</strong> con <code>pandas</code> y <code>pyreadstat</code>.</li>
+                                <li>Cargar los 8 archivos <code>.sav</code> del directorio <code>data/</code> (4 trimestres de 2024 y 4 trimestres de 2025).</li>
+                                <li>Registrar métricas iniciales: Total de filas consolidadas (~175,000 registros) y 394 columnas por archivo.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Paso 2 -->
+                    <div class="step-item">
+                        <div class="step-node">2</div>
+                        <div class="step-title">Paso 2: Reducción de Dimensionalidad (Técnica 9)</div>
+                        <div class="step-meta">Responsable Principal: <strong>Ignacio</strong></div>
+                        <div class="step-desc">
+                            <ul>
+                                <li>De las 394 columnas, el 95% corresponden a preguntas específicas que no competen al proyecto (preguntas sobre COVID, búsqueda de empleo de cesantes, características físicas de la vivienda, etc.).</li>
+                                <li>Conservar únicamente las variables indispensables:
+                                    <code>ID_AMO</code>, <code>ID_TRIMESTRE</code>, <code>ID_VIVIENDA</code>, <code>ID_HOGAR</code>, <code>ID_LINEA</code>, <code>Sexo</code>, <code>Edad</code>, <code>Condicion_actividad</code>, <code>Nivel_educativo</code>, <code>Amos_educacion</code>, <code>Educacion_titulo</code>, <code>Ingreso_principal</code>, <code>Ingreso_total</code>, <code>Salario_bruto</code>, <code>Horas_hab_principal</code>.
+                                </li>
+                                <li>Documentar la justificación técnica en la plantilla: reducción drástica de complejidad y memoria sin pérdida de información de interés.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Paso 3 -->
+                    <div class="step-item">
+                        <div class="step-node">3</div>
+                        <div class="step-title">Paso 3: Detección y Remoción de Duplicados (Técnica 3)</div>
+                        <div class="step-meta">Responsable Principal: <strong>Ignacio</strong></div>
+                        <div class="step-desc">
+                            <ul>
+                                <li>Verificar duplicados exactos en todas las filas conservadas.</li>
+                                <li>Verificar duplicados lógicos basados en la llave compuesta: <code>(ID_AMO, ID_TRIMESTRE, ID_VIVIENDA, ID_HOGAR, ID_LINEA)</code>.</li>
+                                <li>Si existen registros repetidos, eliminar los duplicados conservando la primera ocurrencia y registrar el número exacto de casos removidos.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Paso 4 -->
+                    <div class="step-item">
+                        <div class="step-node">4</div>
+                        <div class="step-title">Paso 4: Delimitación Poblacional & Validación de Tipos (Técnica 4)</div>
+                        <div class="step-meta">Responsable Principal: <strong>Jeremy</strong></div>
+                        <div class="step-desc">
+                            <ul>
+                                <li><strong>Filtrar Condición de Actividad:</strong> Seleccionar únicamente personas ocupadas (<code>Condicion_actividad == 1</code>). Justificar: el ingreso neto laboral solo existe para quienes trabajan.</li>
+                                <li><strong>Filtrar Rango de Edad:</strong> Personas entre 18 y 65 años inclusive (<code>Edad >= 18 & Edad <= 65</code>).</li>
+                                <li><strong>Filtrar Sexo:</strong> Códigos 1 (Hombre) y 2 (Mujer).</li>
+                                <li><strong>Conversión de Tipos:</strong> Asegurar que <code>Edad</code> sea entero, <code>Ingreso_principal</code> numérico continuo (double/float), y <code>Sexo</code> factor.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Paso 5 -->
+                    <div class="step-item">
+                        <div class="step-node">5</div>
+                        <div class="step-title">Paso 5: Tratamiento de Incoherencias Lógicas (Técnica 8)</div>
+                        <div class="step-meta">Responsable Principal: <strong>Jeremy</strong></div>
+                        <div class="step-desc">
+                            <ul>
+                                <li>Verificar si el <code>Ingreso_principal</code> (neto) es estrictamente menor o igual que el <code>Salario_bruto</code> (el salario neto no puede superar el bruto tras deducciones de ley de la CCSS y Hacienda).</li>
+                                <li>Verificar consistencia entre <code>Edad</code> y <code>Nivel_educativo</code>: descartar casos inverosímiles (ej. personas de 18 o 19 años con grado de maestría o posgrado concluido, ya que requieren años mínimos de formación acumulada).</li>
+                                <li>Registrar la cantidad de observaciones anómalas encontradas y justificar su depuración.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Paso 6 -->
+                    <div class="step-item">
+                        <div class="step-node">6</div>
+                        <div class="step-title">Paso 6: Manejo de Faltantes & Limpieza Tipográfica (Técnicas 1 y 2)</div>
+                        <div class="step-meta">Responsable Principal: <strong>Lucas</strong></div>
+                        <div class="step-desc">
+                            <ul>
+                                <li><strong>Decodificar Missing Values:</strong> En SPSS / ECE, los valores no reportados de ingreso se codifican como <code>99999999</code> ("No especificado") o <code>0</code>. Reemplazar explícitamente estos códigos por <code>NA</code>.</li>
+                                <li><strong>Análisis de No Respuesta:</strong> Calcular el porcentaje de valores faltantes en la variable de ingreso (~10% a 15% típico en encuestas del INEC).</li>
+                                <li><strong>Tratamiento:</strong> Dado que el ingreso es la variable dependiente clave de la investigación, eliminar las filas con <code>NA</code> en ingreso (la imputación en salarios generaría sesgo de varianza no deseado para evaluación salarial).</li>
+                                <li><strong>Normalización de Cadenas:</strong> Limpiar espacios en blanco superfluos y caracteres especiales en etiquetas categóricas.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Paso 7 -->
+                    <div class="step-item">
+                        <div class="step-node">7</div>
+                        <div class="step-title">Paso 7: Codificación de Variables Categóricas (Técnica 7)</div>
+                        <div class="step-meta">Responsable Principal: <strong>Lucas</strong></div>
+                        <div class="step-desc">
+                            <ul>
+                                <li><strong>Variable Sexo:</strong> Mapear valores a <code>Hombre</code> (1) y <code>Mujer</code> (2).</li>
+                                <li><strong>Variable Nivel Educativo:</strong> Crear un factor ordenado con las categorías canónicas del INEC:
+                                    <ol style="margin-left: 20px; margin-top: 5px;">
+                                        <li>Sin instrucción / Primaria incompleta</li>
+                                        <li>Primaria completa</li>
+                                        <li>Secundaria incompleta</li>
+                                        <li>Secundaria completa</li>
+                                        <li>Superior no universitaria</li>
+                                        <li>Superior universitaria sin título</li>
+                                        <li>Superior universitaria con título</li>
+                                        <li>Posgrado (Maestría / Doctorado)</li>
+                                    </ol>
+                                </li>
+                                <li><strong>Variable Grupos de Edad:</strong> Construir variable categórica etaria (ej. 18-24, 25-34, 35-49, 50-65) para los contrastes de varianza posteriores.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Paso 8 -->
+                    <div class="step-item">
+                        <div class="step-node">8</div>
+                        <div class="step-title">Paso 8: Valores Atípicos & Normalización/Escalado (Técnicas 5 y 6)</div>
+                        <div class="step-meta">Responsable Principal: <strong>Daniel</strong></div>
+                        <div class="step-desc">
+                            <ul>
+                                <li><strong>Diagnóstico de Outliers:</strong> Generar diagramas de caja (boxplots) e histogramas del ingreso neto.</li>
+                                <li><strong>Método Estadístico:</strong> Calcular límites IQR: $[Q_1 - 1.5 	imes IQR, Q_3 + 1.5 	imes IQR]$ y puntajes Z-score ($|Z| > 3$).</li>
+                                <li><strong>Criterio de Dominio:</strong> Identificar salarios inferiores al mínimo legal de Costa Rica para jornadas completas (MTSS ~ ₡350.000) o valores extremos desproporcionados (salarios superiores a ₡15.000.000/mes). Decidir si se filtran o winsorizan según consistencia.</li>
+                                <li><strong>Normalización / Escalado:</strong> Dado que el ingreso exhibe fuerte asimetría positiva hacia la derecha, aplicar transformación logarítmica: <code>log_ingreso = log(Ingreso_principal)</code> y estandarización Z-score. Justificar con base teórica en la ecuación de Mincer.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Paso 9 -->
+                    <div class="step-item">
+                        <div class="step-node">9</div>
+                        <div class="step-title">Paso 9: Validación de Dominio Experto & Resultados (Técnica 10)</div>
+                        <div class="step-meta">Responsable Principal: <strong>Daniel</strong> | Apoyo: Todos</div>
+                        <div class="step-desc">
+                            <ul>
+                                <li>Comparar la media y mediana salarial calculada con los reportes oficiales del INEC contenidos en los archivos <code>seempleoeceiiitri2010-itri2026.04.xlsx</code> y <code>seempleoeceiiitri2010-itri2026.05.xlsx</code>.</li>
+                                <li>Verificar si la brecha por sexo (hombres vs mujeres) y por nivel de instrucción refleja la tendencia macroeconómica conocida.</li>
+                                <li>Calcular las métricas del dataset final: Filas iniciales vs finales, porcentaje de retención (% útil) y número de columnas finales.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Paso 10 -->
+                    <div class="step-item">
+                        <div class="step-node">10</div>
+                        <div class="step-title">Paso 10: Llenado de la Plantilla Word & Generación del PDF</div>
+                        <div class="step-meta">Responsable Principal: <strong>Ignacio</strong> | Todos aportan sus secciones</div>
+                        <div class="step-desc">
+                            <ul>
+                                <li>Cada miembro redacta en la plantilla <code>CI0115_PlantillaProyecto_LimpiezaDatos.docx</code> las secciones que le fueron asignadas.</li>
+                                <li>Completar la tabla resumen de 9 problemas con los números exactos extraídos del script.</li>
+                                <li>Pegar en los Anexos el script reproducible documentado.</li>
+                                <li>Revisión ortográfica de estilo académico y exportar a PDF final para entrega.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PESTAÑA 3: 10 TÉCNICAS T5 AL 100% ==================== -->
+        <div id="tab-tecnicas" class="tab-pane">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Alineación 100% con las Técnicas de Limpieza (T5_Estadistica_LimpiezaDatos.pdf)</h2>
+                </div>
+                <p style="margin-bottom: 20px;">
+                    En la siguiente tabla se detalla cómo cada una de las 10 técnicas presentadas por la docente en la clase se aplica de forma rigurosa y fundamentada al dataset de la Encuesta Continua de Empleo (ECE).
+                </p>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">#</th>
+                                <th style="width: 20%;">Técnica T5</th>
+                                <th style="width: 20%;">Variable Afectada</th>
+                                <th style="width: 35%;">Estrategia y Justificación Estadística</th>
+                                <th style="width: 20%;">Responsable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1</strong></td>
+                                <td><strong>Manejo de valores faltantes (missing data)</strong></td>
+                                <td><code>Ingreso_principal</code>, <code>Ingreso_total</code>, <code>Amos_educacion</code></td>
+                                <td>
+                                    Detección de códigos de no respuesta de la ECE (<code>99999999</code> = "No especificado", <code>99</code> = "Ignorado", <code>0</code> = no aplica).
+                                    Conversión a <code>NA</code>. Exclusión listwise fundamentada: al ser el ingreso la variable respuesta principal, su imputación introduce sesgo no deseado.
+                                </td>
+                                <td><span class="badge badge-amber">Lucas</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>2</strong></td>
+                                <td><strong>Corrección de errores tipográficos o inconsistencias</strong></td>
+                                <td>Etiquetas de texto de <code>Nivel_educativo</code> y nombres de columnas</td>
+                                <td>
+                                    Normalización a snake_case, eliminación de espacios superfluos (<code>strip()</code>/<code>str_trim()</code>), estandarización de caracteres acentuados y capitalización uniforme.
+                                </td>
+                                <td><span class="badge badge-amber">Lucas</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>3</strong></td>
+                                <td><strong>Filtrado de datos duplicados</strong></td>
+                                <td>Llave: <code>(ID_AMO, ID_TRIMESTRE, ID_VIVIENDA, ID_HOGAR, ID_LINEA)</code></td>
+                                <td>
+                                    Búsqueda de duplicaciones exactas y por identificadores compuestos de vivienda y miembro del hogar mediante <code>distinct()</code> o <code>drop_duplicates()</code>.
+                                </td>
+                                <td><span class="badge badge-blue">Ignacio</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>4</strong></td>
+                                <td><strong>Conversión y validación de tipos de datos</strong></td>
+                                <td>Todas las columnas seleccionadas</td>
+                                <td>
+                                    Casteo explícito de tipos: <code>Edad</code> a entero, <code>Ingreso_principal</code> a numérico continuo, <code>Sexo</code> a factor categórico nominal, <code>Nivel_educativo</code> a factor ordinal.
+                                </td>
+                                <td><span class="badge badge-teal">Jeremy</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>5</strong></td>
+                                <td><strong>Tratamiento de valores atípicos (outliers)</strong></td>
+                                <td><code>Ingreso_principal</code></td>
+                                <td>
+                                    Detección con método de Rango Intercuartílico ($1.5 	imes IQR$) y Z-Score ($|Z|>3$). Visualización con boxplots por nivel educativo y sexo. Depuración de salarios inverosímiles (menores al costo de transporte o superiores a umbrales atípicos).
+                                </td>
+                                <td><span class="badge badge-purple">Daniel</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>6</strong></td>
+                                <td><strong>Normalización y escalado</strong></td>
+                                <td><code>Ingreso_principal</code></td>
+                                <td>
+                                    Transformación logarítmica ($\ln(	ext{ingreso})$) para corregir el sesgo y asimetría positiva de la distribución de ingresos laborales (Modelo de Mincer). Estandarización Z-score para comparación entre grupos.
+                                </td>
+                                <td><span class="badge badge-purple">Daniel</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>7</strong></td>
+                                <td><strong>Codificación de variables categóricas</strong></td>
+                                <td><code>Nivel_educativo</code>, <code>Sexo</code>, <code>Grupo_edad</code></td>
+                                <td>
+                                    Codificación ordinal de los niveles de escolaridad (desde Sin instrucción hasta Posgrado). Binarización de sexo (0: Hombre, 1: Mujer) o recodificación con factores para modelos estadísticos futuros.
+                                </td>
+                                <td><span class="badge badge-amber">Lucas</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>8</strong></td>
+                                <td><strong>Detección y corrección de incoherencias lógicas</strong></td>
+                                <td>Cruce <code>Edad</code> vs <code>Nivel_educativo</code>; <code>Ingreso_principal</code> vs <code>Salario_bruto</code></td>
+                                <td>
+                                    Verificación de consistencia entre pares de variables: personas de corta edad (18 años) que aseguran tener posgrado/doctorado; o ingreso mensual neto mayor que el salario bruto reportado.
+                                </td>
+                                <td><span class="badge badge-teal">Jeremy</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>9</strong></td>
+                                <td><strong>Reducción de dimensionalidad</strong></td>
+                                <td>Dataset original (394 variables)</td>
+                                <td>
+                                    Selección fundamentada de variables (Feature Selection): descarte de más de 380 variables irrelevantes para el objetivo (vivienda, subsidios, covid, cesantía) conservando solo las columnas demográficas, educativas y salariales esenciales.
+                                </td>
+                                <td><span class="badge badge-blue">Ignacio</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>10</strong></td>
+                                <td><strong>Revisión manual y validación con dominio experto</strong></td>
+                                <td>Conjunto limpio final</td>
+                                <td>
+                                    Contraste de las medianas salariales por sexo y educación con las tablas oficiales del INEC contenidas en los libros de Excel de referencia <code>seempleoece...xlsx</code> y la legislación de salarios mínimos de Costa Rica.
+                                </td>
+                                <td><span class="badge badge-purple">Daniel</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PESTAÑA 4: GUÍA PLANTILLA WORD ==================== -->
+        <div id="tab-plantilla" class="tab-pane">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Mapeo Exacto para Llenar la Plantilla Word (CI0115_PlantillaProyecto_LimpiezaDatos.docx)</h2>
+                </div>
+                <p style="margin-bottom: 15px;">
+                    A continuación se presenta el contenido que debe escribir cada integrante en cada sección de la plantilla oficial de la Escuela de Ciencias de la Computación e Informática (ECCI - UCR).
+                </p>
+
+                <!-- Portada -->
+                <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                    <h4 style="color: var(--primary); margin-bottom: 8px;">1. Portada del Trabajo</h4>
+                    <p style="font-size: 0.9rem;">
+                        <strong>Curso:</strong> CI-0115 Probabilidad y Estadística | <strong>Docente:</strong> Dra. Kryscia Ramírez Benavides<br>
+                        <strong>Título:</strong> Limpieza y Preparación del Dataset de la Encuesta Continua de Empleo (ECE 2024-2025) para el Análisis de Brechas Salariales según Nivel Educativo, Sexo y Edad en Costa Rica.<br>
+                        <strong>Integrantes:</strong> Ignacio [Apellido], Jeremy [Apellido], Lucas [Apellido], Daniel [Apellido].
+                    </p>
+                </div>
+
+                <!-- Sección 1 -->
+                <div class="card" style="border-left: 4px solid #2563eb;">
+                    <h3 style="font-size: 1.15rem; margin-bottom: 8px;">Sección 1: Información General del Conjunto de Datos</h3>
+                    <span class="badge badge-blue">Responsable: Ignacio</span>
+                    <ul style="font-size: 0.9rem; margin-top: 10px; padding-left: 20px;">
+                        <li><strong>Nombre del dataset:</strong> Encuesta Continua de Empleo (ECE) - Período 2024 a 2025 (8 trimestres).</li>
+                        <li><strong>Fuente / Origen:</strong> Instituto Nacional de Estadística y Censos (INEC) de Costa Rica (repositorio oficial de microdatos).</li>
+                        <li><strong>Dimensiones iniciales:</strong> Aproximadamente 175,000 registros y 394 columnas iniciales en formato SPSS (<code>.sav</code>).</li>
+                        <li><strong>Breve descripción:</strong> Encuesta por muestreo probabilístico continuo representativa a nivel nacional, orientada a cuantificar y caracterizar la fuerza de trabajo, la condición de actividad, el desempleo y los ingresos laborales en Costa Rica.</li>
+                    </ul>
+                </div>
+
+                <!-- Sección 2 -->
+                <div class="card" style="border-left: 4px solid #d97706;">
+                    <h3 style="font-size: 1.15rem; margin-bottom: 8px;">Sección 2: Problemas Identificados (Tabla Obligatoria)</h3>
+                    <span class="badge badge-amber">Responsables: Todos (Lucas consolida)</span>
+                    <p style="font-size: 0.9rem; margin: 10px 0;">Esta es la tabla exacta que exige la plantilla. Los integrantes deben llenarla con las cifras arrojadas por la ejecución del script:</p>
+                    
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tipo de problema</th>
+                                    <th>Columna afectada</th>
+                                    <th>Cantidad</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Datos duplicados</strong></td>
+                                    <td>Todas / Identificadores</td>
+                                    <td><em>[Dato del script]</em></td>
+                                    <td>Registros con idéntica información en vivienda, hogar y línea de persona.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Valores faltantes</strong></td>
+                                    <td><code>Ingreso_principal</code>, <code>Amos_educacion</code></td>
+                                    <td><em>[Dato del script]</em></td>
+                                    <td>Presencia de valores NA y códigos reservados de no respuesta (99999999 "No especificado" y 0).</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Errores tipográficos</strong></td>
+                                    <td>Etiquetas categóricas</td>
+                                    <td><em>[Dato del script]</em></td>
+                                    <td>Inconsistencias en espacios en blanco al inicio o final y diferencias de caracteres.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Formatos incorrectos</strong></td>
+                                    <td><code>Edad</code>, <code>Sexo</code>, <code>Ingreso</code></td>
+                                    <td><em>[Dato del script]</em></td>
+                                    <td>Variables numéricas leídas como cadenas de caracteres o variables categóricas sin tipado de factor.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Codificación de variables categóricas</strong></td>
+                                    <td><code>Nivel_educativo</code>, <code>Sexo</code></td>
+                                    <td><em>[Dato del script]</em></td>
+                                    <td>Categorías con codificación numérica original no intuitiva que requieren ordenamiento ordinal y nombres descriptivos.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Valores atípicos</strong></td>
+                                    <td><code>Ingreso_principal</code></td>
+                                    <td><em>[Dato del script]</em></td>
+                                    <td>Ingresos salariales anómalos (₡1 colón o sumas superiores a los límites del método IQR / Z-score).</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Normalización y Escalado</strong></td>
+                                    <td><code>Ingreso_principal</code></td>
+                                    <td>N/A (transformación global)</td>
+                                    <td>Distribución salarial asimétrica con sesgo positivo extremo que requiere transformación logarítmica.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Incoherencias lógicas</strong></td>
+                                    <td><code>Edad</code> vs <code>Nivel_educativo</code>; <code>Ingreso_principal</code> vs <code>Salario_bruto</code></td>
+                                    <td><em>[Dato del script]</em></td>
+                                    <td>Casos de personas jóvenes con niveles educativos teóricamente imposibles para su edad o ingresos netos mayores al bruto.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reducción de dimensionalidad</strong></td>
+                                    <td>380+ columnas descartadas</td>
+                                    <td>380 variables</td>
+                                    <td>Columnas no relacionadas con el análisis salarial y educativo (vivienda, covid, cesantía).</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sección 3 -->
+                <div class="card" style="border-left: 4px solid #0d9488;">
+                    <h3 style="font-size: 1.15rem; margin-bottom: 8px;">Sección 3: Técnicas Aplicadas</h3>
+                    <span class="badge badge-teal">Responsables: Redacción compartida según rol</span>
+                    <p style="font-size: 0.9rem; margin-top: 10px;">
+                        Redactar cada una de las 10 viñetas explicando <strong>qué se hizo</strong>, <strong>por qué se hizo</strong> y <strong>con cuál función o método</strong> se resolvió, citando la literatura estadística correspondiente.
+                    </p>
+                </div>
+
+                <!-- Sección 4 & 5 -->
+                <div class="card" style="border-left: 4px solid #6366f1;">
+                    <h3 style="font-size: 1.15rem; margin-bottom: 8px;">Sección 4, 5 y 6: Herramientas, Resultados & Referencias</h3>
+                    <span class="badge badge-purple">Responsables: Ignacio y Daniel</span>
+                    <ul style="font-size: 0.9rem; margin-top: 10px; padding-left: 20px;">
+                        <li><strong>Herramientas:</strong> R (v4.3+) con paquetes <code>haven</code> (lectura SPSS), <code>tidyverse</code>, <code>dplyr</code>, <code>ggplot2</code>, <code>scales</code>. (O Python 3.11+ con <code>pandas</code>, <code>pyreadstat</code>, <code>numpy</code>, <code>scipy</code>).</li>
+                        <li><strong>Resultado Final:</strong> Tabla comparativa de filas y columnas (Antes vs Después), tasa de pérdida y justificación de por qué la muestra resultante es estadísticamente sólida.</li>
+                        <li><strong>Referencias (APA 7ma Edición):</strong> Citar a Walpole et al. (2007), INEC (2024) Metodología de la ECE, y la documentación del software estadístico utilizado.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PESTAÑA 5: CÓDIGO R / PYTHON ==================== -->
+        <div id="tab-codigo" class="tab-pane">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Script Técnico Reproducible (Blueprint Modular)</h2>
+                </div>
+                <p style="margin-bottom: 15px;">
+                    Pueden elegir implementar el script en <strong>R</strong> (altamente recomendado en CI-0115) o en <strong>Python</strong>. Ambos scripts están estructurados para que cada integrante identifique exactamente qué bloque de código le corresponde.
+                </p>
+
+                <!-- Botones de lenguaje -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="tab-btn active" id="btn-r" onclick="showCode('r')">Script Completo en R (Tidyverse)</button>
+                    <button class="tab-btn" id="btn-py" onclick="showCode('python')">Script Completo en Python (Pandas)</button>
+                </div>
+
+                <!-- Código R -->
+                <div id="code-r" class="code-container">
+                    <div class="code-header">
+                        <span>limpieza_ece_ci0115.R</span>
+                        <span>Lenguaje: R</span>
+                    </div>
+                    <pre><code># ==============================================================================
+# PROYECTO CI-0115 PROBABILIDAD Y ESTADÍSTICA - UCR
+# SCRIPT DE LIMPIEZA DE DATOS (ECE 2024-2025)
+# Integrantes: Ignacio, Jeremy, Lucas, Daniel
+# ==============================================================================
+
+# Cargar librerías necesarias
+library(haven)      # Para leer archivos .sav de SPSS
+library(tidyverse)  # Manipulación de datos (dplyr, tidyr, readr)
+library(ggplot2)    # Diagnóstico visual de outliers
+
+# ------------------------------------------------------------------------------
+# PARTE 1: INGESTA Y REDUCCIÓN DE DIMENSIONALIDAD (Ignacio)
+# ------------------------------------------------------------------------------
+cat("--- Paso 1: Cargando y fusionando archivos SPSS ---
+")
+archivos_sav &lt;- list.files("data", pattern = "\.sav$", full.names = TRUE)
+
+# Lectura y consolidación de los 8 trimestres
+df_crudo &lt;- map_df(archivos_sav, read_sav)
+n_filas_inicial &lt;- nrow(df_crudo)
+n_col_inicial &lt;- ncol(df_crudo)
+cat("Dimensiones iniciales:", n_filas_inicial, "filas y", n_col_inicial, "columnas
+")
+
+# Reducción de Dimensionalidad: Seleccionar variables críticas para el objetivo
+df_reducido &lt;- df_crudo %&gt;%
+  select(
+    ID_AMO, ID_TRIMESTRE, ID_VIVIENDA, ID_HOGAR, ID_LINEA,
+    Sexo, Edad, Condicion_actividad,
+    Nivel_educativo, Amos_educacion, Educacion_titulo,
+    Ingreso_principal, Ingreso_total, Salario_bruto,
+    Horas_hab_principal
+  )
+
+# Filtrado de duplicados
+df_sin_duplicados &lt;- df_reducido %&gt;%
+  distinct(ID_AMO, ID_TRIMESTRE, ID_VIVIENDA, ID_HOGAR, ID_LINEA, .keep_all = TRUE)
+n_duplicados &lt;- nrow(df_reducido) - nrow(df_sin_duplicados)
+cat("Duplicados eliminados:", n_duplicados, "
+")
+
+# ------------------------------------------------------------------------------
+# PARTE 2: FILTRADO POBLACIONAL Y TIPOS DE DATOS (Jeremy)
+# ------------------------------------------------------------------------------
+cat("--- Paso 2: Filtrado de población objetivo ---
+")
+# Delimitación: Personas ocupadas (1), entre 18 y 65 años, Sexo Hombre (1) o Mujer (2)
+df_filtrado &lt;- df_sin_duplicados %&gt;%
+  filter(
+    Condicion_actividad == 1,
+    Edad &gt;= 18 &amp; Edad &lt;= 65,
+    Sexo %in% c(1, 2)
+  ) %&gt;%
+  mutate(
+    Edad = as.integer(Edad),
+    Sexo = as.factor(Sexo),
+    Ingreso_principal = as.numeric(Ingreso_principal),
+    Salario_bruto = as.numeric(Salario_bruto)
+  )
+
+# Incoherencias Lógicas:
+# a) Salario neto no puede superar el bruto (tras retenciones sociales)
+# b) Menores de 20 años con maestría/doctorado
+df_consistente &lt;- df_filtrado %&gt;%
+  filter(
+    !(Ingreso_principal &gt; Salario_bruto &amp; !is.na(Salario_bruto) &amp; Salario_bruto &gt; 0),
+    !(Edad &lt; 21 &amp; Nivel_educativo &gt;= 8) # Nivel 8 = Posgrado
+  )
+
+# ------------------------------------------------------------------------------
+# PARTE 3: FALTANTES Y CODIFICACIÓN CATEGÓRICA (Lucas)
+# ------------------------------------------------------------------------------
+cat("--- Paso 3: Tratamiento de faltantes y codificación ---
+")
+# En ECE: 99999999 = No especificado; 0 = Sin ingreso reportado
+df_faltantes &lt;- df_consistente %&gt;%
+  mutate(
+    Ingreso_principal = ifelse(Ingreso_principal %in% c(99999999, 0), NA, Ingreso_principal)
+  ) %&gt;%
+  filter(!is.na(Ingreso_principal)) # Listwise deletion justificada en la variable respuesta
+
+# Codificación Categórica de Nivel Educativo y Sexo
+df_codificado &lt;- df_faltantes %&gt;%
+  mutate(
+    Sexo = factor(Sexo, levels = c(1, 2), labels = c("Hombre", "Mujer")),
+    Nivel_educativo_cat = factor(
+      case_when(
+        Nivel_educativo %in% c(0, 1) ~ "Sin instrucción / Primaria incompleta",
+        Nivel_educativo == 2        ~ "Primaria completa",
+        Nivel_educativo == 3        ~ "Secundaria incompleta",
+        Nivel_educativo == 4        ~ "Secundaria completa",
+        Nivel_educativo == 5        ~ "Superior no universitaria",
+        Nivel_educativo == 6        ~ "Superior universitaria sin título",
+        Nivel_educativo == 7        ~ "Superior universitaria con título",
+        Nivel_educativo &gt;= 8        ~ "Posgrado",
+        TRUE                        ~ "Otro / Desconocido"
+      ),
+      levels = c(
+        "Sin instrucción / Primaria incompleta", "Primaria completa",
+        "Secundaria incompleta", "Secundaria completa",
+        "Superior no universitaria", "Superior universitaria sin título",
+        "Superior universitaria con título", "Posgrado"
+      ),
+      ordered = TRUE
+    ),
+    Grupo_edad = cut(
+      Edad,
+      breaks = c(17, 24, 34, 49, 65),
+      labels = c("18-24", "25-34", "35-49", "50-65")
+    )
+  )
+
+# ------------------------------------------------------------------------------
+# PARTE 4: ATÍPICOS, ESCALADO Y VALIDACIÓN DE DOMINIO (Daniel)
+# ------------------------------------------------------------------------------
+cat("--- Paso 4: Tratamiento de atípicos y normalización ---
+")
+# Detección IQR de Outliers en Ingreso
+Q1 &lt;- quantile(df_codificado$Ingreso_principal, 0.25, na.rm = TRUE)
+Q3 &lt;- quantile(df_codificado$Ingreso_principal, 0.75, na.rm = TRUE)
+IQR_val &lt;- Q3 - Q1
+lim_inf &lt;- max(Q1 - 1.5 * IQR_val, 50000) # Salario mínimo legal de subsistencia
+lim_sup &lt;- Q3 + 3.0 * IQR_val             # Outliers severos
+
+# Filtro de Outliers extremos
+df_limpio &lt;- df_codificado %&gt;%
+  filter(Ingreso_principal &gt;= lim_inf &amp; Ingreso_principal &lt;= lim_sup) %&gt;%
+  mutate(
+    log_ingreso = log(Ingreso_principal),
+    z_ingreso = as.numeric(scale(Ingreso_principal))
+  )
+
+# Métricas finales
+cat("=====================================================
+")
+cat("RESULTADO FINAL TRAS LA LIMPIEZA:
+")
+cat("Filas finales:", nrow(df_limpio), "(Retención:", round(nrow(df_limpio)/n_filas_inicial*100, 2), "%)
+")
+cat("Columnas finales:", ncol(df_limpio), "
+")
+cat("Media salarial neta: ₡", round(mean(df_limpio$Ingreso_principal)), "
+")
+cat("Mediana salarial neta: ₡", round(median(df_limpio$Ingreso_principal)), "
+")
+cat("=====================================================
+")
+
+# Guardar dataset limpio resultante
+write_csv(df_limpio, "dataset_limpio_ece_2024_2025.csv")
+cat("Archivo 'dataset_limpio_ece_2024_2025.csv' generado con éxito.
+")
+</code></pre>
+                </div>
+
+                <!-- Código Python -->
+                <div id="code-py" class="code-container" style="display: none;">
+                    <div class="code-header">
+                        <span>limpieza_ece_ci0115.py</span>
+                        <span>Lenguaje: Python</span>
+                    </div>
+                    <pre><code># ==============================================================================
+# PROYECTO CI-0115 PROBABILIDAD Y ESTADÍSTICA - UCR
+# SCRIPT DE LIMPIEZA DE DATOS (ECE 2024-2025)
+# Integrantes: Ignacio, Jeremy, Lucas, Daniel
+# ==============================================================================
+
+import glob
+import numpy as np
+import pandas as pd
+import pyreadstat
+
+# ------------------------------------------------------------------------------
+# PARTE 1: INGESTA Y REDUCCIÓN DE DIMENSIONALIDAD (Ignacio)
+# ------------------------------------------------------------------------------
+print("--- Paso 1: Ingesta de archivos .sav ---")
+files = sorted(glob.glob("data/*.sav"))
+dfs = []
+for f in files:
+    data, meta = pyreadstat.read_sav(f)
+    dfs.append(data)
+
+df = pd.concat(dfs, ignore_index=True)
+n_inicial_filas, n_inicial_cols = df.shape
+print(f"Dimensiones iniciales: {n_inicial_filas} filas, {n_inicial_cols} columnas")
+
+# Reducción de dimensionalidad
+cols_keep = [
+    'ID_AMO', 'ID_TRIMESTRE', 'ID_VIVIENDA', 'ID_HOGAR', 'ID_LINEA',
+    'Sexo', 'Edad', 'Condicion_actividad',
+    'Nivel_educativo', 'Amos_educacion', 'Educacion_titulo',
+    'Ingreso_principal', 'Ingreso_total', 'Salario_bruto',
+    'Horas_hab_principal'
+]
+df = df[cols_keep].copy()
+
+# Eliminar duplicados
+n_antes_dup = len(df)
+df.drop_duplicates(subset=['ID_AMO', 'ID_TRIMESTRE', 'ID_VIVIENDA', 'ID_HOGAR', 'ID_LINEA'], inplace=True)
+print(f"Duplicados eliminados: {n_antes_dup - len(df)}")
+
+# ------------------------------------------------------------------------------
+# PARTE 2: FILTRADO POBLACIONAL Y TIPOS DE DATOS (Jeremy)
+# ------------------------------------------------------------------------------
+print("--- Paso 2: Filtrado poblacional ---")
+# Filtros: Ocupados (1), Edad entre 18 y 65, Sexo Hombre (1) o Mujer (2)
+df = df[(df['Condicion_actividad'] == 1) & 
+        (df['Edad'] >= 18) & (df['Edad'] <= 65) & 
+        (df['Sexo'].isin([1, 2]))].copy()
+
+# Tipos de datos
+df['Edad'] = df['Edad'].astype(int)
+df['Ingreso_principal'] = pd.to_numeric(df['Ingreso_principal'], errors='coerce')
+df['Salario_bruto'] = pd.to_numeric(df['Salario_bruto'], errors='coerce')
+
+# Incoherencias lógicas
+mask_incoherente = (df['Ingreso_principal'] > df['Salario_bruto']) & (df['Salario_bruto'] > 0)
+df = df[~mask_incoherente].copy()
+
+# ------------------------------------------------------------------------------
+# PARTE 3: FALTANTES Y CODIFICACIÓN CATEGÓRICA (Lucas)
+# ------------------------------------------------------------------------------
+print("--- Paso 3: Faltantes y codificación ---")
+# Reemplazar códigos de no respuesta de la ECE
+df['Ingreso_principal'] = df['Ingreso_principal'].replace([99999999, 0], np.nan)
+df.dropna(subset=['Ingreso_principal'], inplace=True)
+
+# Codificación de variables
+df['Sexo'] = df['Sexo'].map({1: 'Hombre', 2: 'Mujer'}).astype('category')
+
+edu_map = {
+    0: 'Sin instrucción / Primaria incompleta',
+    1: 'Sin instrucción / Primaria incompleta',
+    2: 'Primaria completa',
+    3: 'Secundaria incompleta',
+    4: 'Secundaria completa',
+    5: 'Superior no universitaria',
+    6: 'Superior universitaria sin título',
+    7: 'Superior universitaria con título',
+    8: 'Posgrado'
+}
+df['Nivel_educativo_cat'] = df['Nivel_educativo'].map(edu_map).fillna('Otro')
+
+df['Grupo_edad'] = pd.cut(
+    df['Edad'], 
+    bins=[17, 24, 34, 49, 65], 
+    labels=['18-24', '25-34', '35-49', '50-65']
+)
+
+# ------------------------------------------------------------------------------
+# PARTE 4: ATÍPICOS, ESCALADO Y VALIDACIÓN (Daniel)
+# ------------------------------------------------------------------------------
+print("--- Paso 4: Tratamiento de atípicos y escalado ---")
+Q1 = df['Ingreso_principal'].quantile(0.25)
+Q3 = df['Ingreso_principal'].quantile(0.75)
+IQR = Q3 - Q1
+lim_inf = max(Q1 - 1.5 * IQR, 50000)
+lim_sup = Q3 + 3.0 * IQR
+
+df_limpio = df[(df['Ingreso_principal'] >= lim_inf) & (df['Ingreso_principal'] <= lim_sup)].copy()
+
+# Escalado y normalización
+df_limpio['log_ingreso'] = np.log(df_limpio['Ingreso_principal'])
+df_limpio['z_ingreso'] = (df_limpio['Ingreso_principal'] - df_limpio['Ingreso_principal'].mean()) / df_limpio['Ingreso_principal'].std()
+
+print("=====================================================")
+print(f"Dimensiones finales: {df_limpio.shape}")
+print(f"Retención muestral: {len(df_limpio) / n_inicial_filas * 100:.2f}%")
+print(f"Mediana ingreso neto: ₡{df_limpio['Ingreso_principal'].median():,.0f}")
+print("=====================================================")
+
+df_limpio.to_csv("dataset_limpio_ece_2024_2025.csv", index=False)
+</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PESTAÑA 6: CHECKLIST DE ENTREGA ==================== -->
+        <div id="tab-checklist" class="tab-pane">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Checklist y Control de Calidad de la Entrega</h2>
+                </div>
+                <p style="margin-bottom: 20px;">
+                    Antes de convertir la plantilla a PDF y realizar la entrega, cada integrante debe verificar y marcar sus criterios completados:
+                </p>
+
+                <h3 style="font-size: 1.05rem; color: #1e40af; margin-bottom: 10px;">Revisión de Ignacio (Coordinador)</h3>
+                <div class="check-item">
+                    <input type="checkbox" id="c1" onchange="toggleDone(this)">
+                    <label for="c1">Portada con datos completos: Sigla (CI-0115), Curso, Nombre de profesora (Kryscia Ramírez), nombres de los 4 integrantes.</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c2" onchange="toggleDone(this)">
+                    <label for="c2">Sección 1 con descripción exhaustiva de la ECE, origen INEC, dimensiones iniciales (~175,000 x 394).</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c3" onchange="toggleDone(this)">
+                    <label for="c3">Sección 4 (Herramientas) con versiones específicas de software y paquetes (haven, tidyverse o pyreadstat).</label>
+                </div>
+
+                <h3 style="font-size: 1.05rem; color: #0f766e; margin-top: 20px; margin-bottom: 10px;">Revisión de Jeremy</h3>
+                <div class="check-item">
+                    <input type="checkbox" id="c4" onchange="toggleDone(this)">
+                    <label for="c4">Población objetivo delimitada con precisión: Ocupados, 18 a 65 años, ambos sexos justificado.</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c5" onchange="toggleDone(this)">
+                    <label for="c5">Reglas de incoherencias lógicas explicadas: ingreso neto vs bruto y años mínimos de edad para títulos universitarios.</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c6" onchange="toggleDone(this)">
+                    <label for="c6">Validación de tipos de datos completa en la tabla de problemas.</label>
+                </div>
+
+                <h3 style="font-size: 1.05rem; color: #d97706; margin-top: 20px; margin-bottom: 10px;">Revisión de Lucas</h3>
+                <div class="check-item">
+                    <input type="checkbox" id="c7" onchange="toggleDone(this)">
+                    <label for="c7">Explicación clara de los códigos de no respuesta de la ECE (99999999 y 0) y justificación de exclusión listwise.</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c8" onchange="toggleDone(this)">
+                    <label for="c8">Estructuración y ordenamiento jerárquico de la variable ordinal Nivel_educativo (desde Sin instrucción hasta Posgrado).</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c9" onchange="toggleDone(this)">
+                    <label for="c9">Tabla de problemas de la plantilla Word completada en todas sus celdas (sin dejar campos vacíos).</label>
+                </div>
+
+                <h3 style="font-size: 1.05rem; color: #6366f1; margin-top: 20px; margin-bottom: 10px;">Revisión de Daniel</h3>
+                <div class="check-item">
+                    <input type="checkbox" id="c10" onchange="toggleDone(this)">
+                    <label for="c10">Tratamiento de outliers con método IQR y Z-Score justificado con boxplots.</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c11" onchange="toggleDone(this)">
+                    <label for="c11">Justificación teórica del escalado logarítmico (log-ingreso) para normalización de la asimetría.</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c12" onchange="toggleDone(this)">
+                    <label for="c12">Validación externa con dominio experto: comparación con las series de empleo del INEC en los archivos seempleoece*.xlsx.</label>
+                </div>
+                <div class="check-item">
+                    <input type="checkbox" id="c13" onchange="toggleDone(this)">
+                    <label for="c13">Referencias bibliográficas completas en formato APA 7ma Edición (Walpole, INEC, paquetes de software).</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            
+            const btnMap = {
+                'tab-roles': 0,
+                'tab-pasos': 1,
+                'tab-tecnicas': 2,
+                'tab-plantilla': 3,
+                'tab-codigo': 4,
+                'tab-checklist': 5
+            };
+            const btns = document.querySelectorAll('#mainTabs .tab-btn');
+            if (btns[btnMap[tabId]]) {
+                btns[btnMap[tabId]].classList.add('active');
+            }
+        }
+
+        // Code switching logic
+        function showCode(lang) {
+            if (lang === 'r') {
+                document.getElementById('code-r').style.display = 'block';
+                document.getElementById('code-py').style.display = 'none';
+                document.getElementById('btn-r').classList.add('active');
+                document.getElementById('btn-py').classList.remove('active');
+            } else {
+                document.getElementById('code-r').style.display = 'none';
+                document.getElementById('code-py').style.display = 'block';
+                document.getElementById('btn-r').classList.remove('active');
+                document.getElementById('btn-py').classList.add('active');
+            }
+        }
+
+        // Checkbox persistence
+        function toggleDone(cb) {
+            const item = cb.parentElement;
+            if (cb.checked) {
+                item.classList.add('done');
+            } else {
+                item.classList.remove('done');
+            }
+            localStorage.setItem('check_' + cb.id, cb.checked);
+        }
+
+        window.onload = function() {
+            document.querySelectorAll('.check-item input[type="checkbox"]').forEach(cb => {
+                const saved = localStorage.getItem('check_' + cb.id);
+                if (saved === 'true') {
+                    cb.checked = true;
+                    cb.parentElement.classList.add('done');
+                }
+            });
+        };
+    </script>
+</body>
+</html>
