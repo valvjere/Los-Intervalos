@@ -10,7 +10,7 @@ Rplots.pdf
 .DS_Store
 
 # Datos
-*.sav
+
 *.rds
 
 # Resultados generados
