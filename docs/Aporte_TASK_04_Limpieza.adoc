@@ -1,0 +1,51 @@
+= TASK 04: Atípicos, escalado y validación
+
+Responsable: Daniel. Técnicas 5, 6 y 10 de T5.
+Ejecución y configuración: link:../scripts/task_04/README.md[README].
+Fórmulas y referencias: link:Fundamento_Libros_TASK_04.adoc[libros del curso].
+
+== Entrada y dependencia del equipo
+
+El módulo recibe la tabla preparada por las etapas anteriores.
+Mientras esa tabla no esté disponible, usa el consolidado de ingesta.
+No incorpora filtros de población adicionales ni corrige duplicados o categorías.
+Por ello los resultados preliminares deben recalcularse con la entrega integrada.
+
+La configuración identifica la variable, los códigos faltantes, las unidades y
+los grupos. Las técnicas 5 y 6 admiten distintas tablas numéricas; la técnica 10
+usa un adaptador específico para la ECE y requiere una referencia comparable.
+
+== Técnicas aplicadas
+
+* *5 — Atípicos:* IQR = Q3 - Q1. Se señalan valores fuera de
+  [Q1 - 1,5 IQR, Q3 + 1,5 IQR] y casos con |Z| > 3.
+  Z usa media y desviación muestral. La unión de alertas evita duplicados.
+  Los boxplots por grupo usan cuartiles propios, distintos del límite global.
+* *6 — Transformación y escalado:* ln(x) para valores utilizables positivos;
+  Z reutiliza el diagnóstico anterior. Se compara la asimetría
+  g1 = m3 / m2^(3/2), con momentos de denominador n.
+  Una reducción de asimetría no demuestra normalidad.
+* *10 — Dominio experto:* promedio bruto ponderado =
+  suma(peso * ingreso) / suma(peso), cotejado con los cuadros salariales INEC.
+  La tolerancia de un colón es numérica, no una prueba de hipótesis.
+  Este control nacional no valida directamente el ingreso neto de la entrada.
+
+== Sección 5: resultado final
+
+Los resultados de cada ejecución están en los CSV y en `aporte_plantilla.txt`.
+La tabla de antes y después documenta filas, columnas y valores utilizables.
+El módulo conserva las observaciones y agrega columnas de diagnóstico;
+los atípicos requieren revisión antes de decidir un tratamiento.
+
+La retención dentro del módulo es 100 % para una entrada no vacía.
+La retención final del proyecto sigue pendiente de integrar las etapas de los
+compañeros y conocer la base inicial y final del proceso completo.
+Los casos no evaluables se registran como NA, sin contarlos como cero problemas.
+
+== Sección 6: referencias
+
+El fundamento metodológico incluye las referencias APA y páginas de Horgan
+(2009), Baron (2019), Walpole et al. (2012) y las fuentes del INEC.
+Cada ejecución copia ese documento como `fundamento_metodologico.adoc`.
+Las citas del software y versiones se guardan en `referencias_software.txt`
+y `versiones_R.txt`; las huellas de entrada y código, en `trazabilidad.csv`.

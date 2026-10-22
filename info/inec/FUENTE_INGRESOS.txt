@@ -1,0 +1,21 @@
+REFERENCIA PÚBLICA INCORPORADA PARA LA TÉCNICA 10
+
+Autor: Instituto Nacional de Estadística y Censos de Costa Rica (INEC).
+Operación: Encuesta Continua de Empleo.
+Título: Costa Rica: Promedio del ingreso mensual en el empleo principal según características del empleo.
+Cobertura del libro: JAS 2010 a JJA 2026.
+Fecha de consulta/descarga: 21 de octubre de 2026.
+Página de publicación: https://admin.inec.cr/node/46287
+Archivo público: https://admin.inec.cr/sites/default/files/2026-10/seempleoiiitri2010-jja2026-04.xlsx
+Archivo local: seempleoiiitri2010-jja2026-04.xlsx
+
+Definición comprobada: ingreso bruto corriente del empleo principal; ocupados con ingreso conocido positivo.
+Hojas utilizadas: C4 total, C4 hombre, C4 mujer.
+Cabecera de períodos: fila 5. Promedio total: fila 8. Nota metodológica: A45.
+Períodos utilizados: EFM, AMJ, JAS y OND de 2024 y 2025.
+Se conserva el archivo completo sin editarlo y su MD5 en cada ejecución.
+
+No confundir con seempleoeceiiitri2010-itri2026.04.xlsx y .05.xlsx de la raíz:
+esos libros describen formalidad e informalidad y no contienen el promedio mensual buscado.
+La referencia salarial publica ingreso bruto, mientras el diagnóstico principal del proyecto usa ingreso neto.
+El módulo compara un control nacional separado para mantener definiciones equivalentes.

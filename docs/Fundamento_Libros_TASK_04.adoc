@@ -1,0 +1,176 @@
+= Fundamento del aporte de Daniel en los libros del curso
+:toc:
+:sectnums:
+
+Este documento explica las técnicas 5, 6 y 10 implementadas en el repositorio.
+Relaciona las fórmulas con los textos proporcionados por el curso y distingue las convenciones de R de las decisiones específicas del proyecto ECE.
+Las páginas impresas sirven para citar; la posición PDF sirve para encontrar el contenido en los archivos entregados por Daniel.
+No se incorporan copias de los libros al repositorio.
+
+== Fuentes consultadas
+
+[cols="2,3,1,1",options="header"]
+|===
+|Libro |Tema |Páginas impresas |Posiciones PDF
+|Horgan (2009) |Cuantiles e IQR con R |16–17 |36–37
+|Horgan (2009) |Desviación muestral y coeficiente de asimetría, ecuación 2.1 |19–21 |39–41
+|Horgan (2009) |Boxplots, regla 1,5 IQR y revisión de valores extremos |23–26 |43–46
+|Horgan (2009) |Estandarización de una variable normal |336–337 |356–357
+|Baron (2019) |Cuantiles, ejemplo 8.14 |223–224 |244–245
+|Baron (2019) |Varianza muestral, ecuación 8.4 |225 |246
+|Baron (2019) |IQR y revisión de atípicos |228–229 |249–250
+|Baron (2019) |Boxplots y comparación entre grupos |235–236 |256–257
+|Baron (2019) |Estandarización normal, ecuaciones 4.16–4.17 |90 |111
+|Baron (2019) |Momentos centrales y denominadores n frente a n - 1 |245–246 |266–267
+|Walpole et al. (2012) |Boxplots e IQR, ejemplo 1.5 |24–25 |45–46
+|Walpole et al. (2012) |Lognormal y transformación ln, sección 6.9 |201 |222
+|Walpole et al. (2012) |Transformaciones y estabilización de varianza, sección 13.10 |543–545 |564–566
+|===
+
+Las posiciones corresponden exactamente a los PDF proporcionados, no a cualquier digitalización de la misma edición.
+Horgan se cita como 2009 porque así lo indica su página legal (PDF 6), aunque el nombre del archivo contenga 2008.
+
+== Técnica 5 Identificar observaciones que requieren revisión
+
+=== Cuartiles e IQR
+
+Horgan presenta Q1 y Q3 como cuartiles y define IQR = Q3 - Q1 (pp. 16–17).
+La regla de boxplot señala valores fuera del intervalo desde Q1 - 1,5 IQR hasta Q3 + 1,5 IQR (pp. 23–26; véase también Baron, pp. 228–229, y Walpole et al., pp. 24–25).
+En el código, el factor 1,5 se puede cambiar con `analisis$multiplicador_iqr`.
+Un valor exactamente igual al límite no queda fuera del intervalo y no se marca.
+
+El cálculo de cuartiles de una muestra finita admite convenciones distintas.
+Por eso `analisis$tipo_cuantil = 7L` es una decisión explícita de implementación en R, no una fórmula que se atribuya indistintamente a los tres libros.
+Para este tipo, la posición interpolada de un percentil p es h = 1 + (n - 1)p; se interpola entre las observaciones ordenadas vecinas.
+Los cuartiles y los once cuantiles (0 %, 10 %, ..., 100 %) del ejemplo `downtime` de Horgan (datos en p. 7, resultados en pp. 16–17) se reproducen con este algoritmo.
+El texto usa `quantile()` sin identificarlo por el número 7.
+
+[cols="2,2,2,3",options="header"]
+|===
+|Ejemplo verificado |Tipo 7 de R |Tipo 2 de R |Resultado
+|Horgan, `downtime`, n = 23 |Q1 = 16; Q3 = 31,5 |Q1 = 14; Q3 = 33 |El tipo 7 reproduce los cuantiles publicados en pp. 16–17.
+|Baron, tiempos CPU, n = 30 |Q1 = 34,25; Q3 = 58,25 |Q1 = 34; Q3 = 59 |El tipo 2 reproduce los cuartiles del ejemplo 8.14, p. 224.
+|Walpole et al., tabla 1.8, n = 40 |IQR = 0,3475; cuatro alertas |IQR = 0,365; tres alertas |El tipo 2 reproduce el ejemplo 1.5, p. 25.
+|===
+
+Estos contrastes no prueban que Baron o Walpole definan universalmente el algoritmo 2.
+Muestran por qué no debe mezclarse una cuenta manual de un texto con otra convención de software sin declararlo.
+Para reproducir esos ejemplos se puede usar `list(analisis = list(tipo_cuantil = 2L))` como configuración parcial.
+Se admiten los tipos enteros 1–9 de R; el equipo debe acordar la convención antes de interpretar una nueva entrega.
+
+El tipo elegido queda registrado en el CSV de límites y la configuración resuelta.
+Las banderas y los boxplots usan ese mismo tipo; cada boxplot por grupo vuelve a calcular sus cuartiles dentro del grupo, por lo que puede diferir del diagnóstico global.
+Los bigotes llegan a observaciones no atípicas y los puntos externos representan casos señalados; no deben confundirse los extremos de los bigotes con los límites aritméticos exactos.
+
+=== Desviación muestral y Z
+
+Horgan (pp. 19–20) y Baron (p. 225) definen la desviación muestral como:
+
+[source,text]
+----
+media = sum(x) / n
+s = sqrt(sum((x - media)^2) / (n - 1))
+z = (x - media) / s
+----
+
+La última expresión es la estandarización muestral usada por el programa.
+Los textos presentan Z = (X - mu) / sigma para una variable normal (Horgan, pp. 336–337; Baron, p. 90).
+Aquí se sustituyen los parámetros por la media y desviación de los valores utilizables y se usa la distancia resultante como diagnóstico descriptivo.
+No se deduce que los ingresos sean normales, ni que una bandera tenga un valor p o una probabilidad normal determinada.
+El umbral `abs(z) > 3` es una regla exploratoria configurable del proyecto; no es una instrucción de los libros para borrar todos esos casos.
+Si hay menos de dos observaciones o s = 0, Z queda no evaluable.
+
+=== Una alerta no demuestra un error
+
+Horgan (pp. 25–26) ilustra una corrección realizada después de revisar la fuente y aclara que un extremo también podría ser auténtico.
+Baron (p. 229) recomienda investigar la procedencia del dato antes de excluirlo.
+Por ello el programa conserva todas las filas y añade banderas para revisión.
+La unión de IQR y Z evita contar dos veces una observación señalada por ambos métodos.
+
+== Técnica 6 Transformar y comparar escalas
+
+=== Asimetría descriptiva
+
+Horgan define el coeficiente de asimetría en su ecuación 2.1 (p. 21).
+La siguiente forma es algebraicamente equivalente a la del libro y es la implementada:
+
+[source,text]
+----
+m2 = sum((x - media)^2) / n
+m3 = sum((x - media)^3) / n
+g1 = m3 / m2^(3/2)
+----
+
+Los momentos dividen por n; la desviación muestral usada para Z divide por n - 1.
+Baron distingue expresamente ambas convenciones (pp. 245–246).
+Los denominadores corresponden a cantidades distintas.
+El ejemplo `downtime` de Horgan produce g1 = -0,04818095, y las pruebas reproducen ese resultado.
+g1 positivo indica asimetría hacia la derecha; negativo, hacia la izquierda.
+Una menor magnitud indica menor asimetría medida por ese coeficiente, pero g1 cercano a cero no demuestra normalidad.
+
+=== Logaritmo natural
+
+Se crea `log(x)`, es decir, ln(x), sólo para valores utilizables positivos.
+Walpole et al. (sección 6.9, p. 201) definen la lognormal mediante la normalidad de ln(X).
+Es una relación condicional: si X sigue ese modelo, su logaritmo es normal; no demuestra que los ingresos analizados sigan una lognormal.
+La sección 13.10 (pp. 543–545) discute transformaciones para reexpresar variables y estabilizar varianzas en otros contextos.
+Esos conceptos motivan explorar ln(ingreso); la elección concreta para esta base se evalúa con su evidencia, sin afirmar que el libro ordene aplicarla a todo salario.
+La transformación es no lineal: comprime diferencias entre valores grandes y puede reducir la asimetría.
+Su conveniencia se evalúa comparando histogramas y g1 antes y después, sin sustituir la columna original.
+El log no garantiza que cualquier muestra se convierta en normal.
+No se usa `log(x + 1)` para ocultar faltantes, códigos o mediciones no positivas.
+
+=== Estandarización
+
+La segunda columna transforma cada dato a unidades de desviación muestral: `(x - media) / s`.
+Su media es aproximadamente cero y su desviación aproximadamente uno por construcción.
+Con s positivo esta transformación lineal conserva la asimetría; cambiar la escala no convierte una distribución asimétrica en normal.
+Esta distinción es consistente con las propiedades de transformaciones lineales en Horgan (pp. 155–156) y Baron (p. 53).
+Por eso no se confunden el logaritmo, que puede cambiar la forma, y Z, que sólo cambia centro y escala.
+
+== Técnica 10 Control de reproducción con la fuente oficial
+
+Horgan (pp. 146–147) y Baron (pp. 47–48) presentan la esperanza como un promedio ponderado por probabilidades.
+Esto ayuda a explicar la idea de promedio ponderado, pero los factores de expansión de una encuesta no son esas probabilidades individuales.
+En el adaptador ECE se calcula:
+
+[source,text]
+----
+media_ponderada = sum(peso * ingreso_bruto) / sum(peso)
+----
+
+La conexión algebraica consiste en normalizar los pesos por su suma.
+La justificación de los factores, el universo de ocupados, los períodos y la definición de ingreso bruto proviene del INEC, no de esa identidad algebraica ni de los manuales.
+El módulo compara el resultado con las series oficiales como control de consistencia.
+La tolerancia de un colón es una decisión operativa de comparación, no un nivel de significancia ni una prueba de hipótesis.
+No se calculan errores estándar del diseño muestral.
+
+El control usa microdatos originales y el ingreso bruto nacional, mientras que las técnicas 5 y 6 reciben una tabla del equipo y diagnostican la variable que éste configure.
+La coincidencia con INEC no valida automáticamente cada registro, el ingreso neto o una futura submuestra universitaria.
+Para otra fuente se necesita una referencia comparable y un adaptador apropiado; si faltan, el control permanece pendiente.
+
+== Verificación
+
+`tests/task_04/test_tecnicas_5_6_10.R` contrasta fórmulas, límites, conservación y ejemplos numéricos de los libros.
+`tests/task_04/test_configuracion_y_flujo.R` comprueba lectura, configuración y ejecución con distintas entradas.
+La opción `--integracion` añade el cotejo con las 24 cifras oficiales del perfil ECE actual.
+Estas verificaciones comprueban implementación y consistencia; no reemplazan revisar el significado de las variables o los registros.
+
+Cada corrida copia este documento como `fundamento_metodologico.adoc` y registra su huella MD5 en la trazabilidad.
+Las referencias de versiones de software se generan mediante `citation()` y se guardan por separado.
+
+== Referencias
+
+Baron, M. (2019). _Probability and statistics for computer scientists_ (3rd ed.). CRC Press.
+
+Horgan, J. M. (2009). _Probability with R: An introduction with computer science applications_. John Wiley & Sons.
+
+Walpole, R. E., Myers, R. H., Myers, S. L., y Ye, K. (2012). _Probability & statistics for engineers & scientists_ (9th ed.). Prentice Hall.
+
+Instituto Nacional de Estadística y Censos. (2026). _Costa Rica: Promedio del ingreso mensual en el empleo principal según características del empleo, JAS 2010–JJA 2026_ [Conjunto de datos, Encuesta Continua de Empleo]. https://admin.inec.cr/node/46287
+
+Instituto Nacional de Estadística y Censos. (s. f.). _Encuesta Continua de Empleo: Microdatos de los trimestres I–IV de 2024 y 2025_ [Archivos SPSS proporcionados en el repositorio Los Intervalos].
+
+R Core Team. (s. f.). _Sample quantiles_ [Documentación de R, implementación de los tipos de cuantiles]. https://stat.ethz.ch/R-manual/R-devel/library/stats/html/quantile.html
+
+Las referencias de R, haven, readxl y ggplot2 corresponden a las versiones instaladas y se consultan en `referencias_software.txt` de cada ejecución.
