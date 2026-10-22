@@ -1,27 +1,28 @@
 # Aporte TASK 03 — Faltantes, tipografía y codificación categórica
 
 Responsable: Lucas. Técnicas 1, 2 y 7 de T5. Las cifras salen de
-`scripts/03_faltantes_y_categorias.R`, que trabaja sobre la población de estudio (ocupados de
-18 a 65 años).
+`scripts/03_faltantes_y_categorias.R`, que parte de la salida de TASK 02 (Jeremy): ocupados de 18
+a 65 años, con tipos validados y sin incoherencias lógicas.
 
 ---
 
 ## Sección 2 — Tabla consolidada de problemas identificados
 
-Atípicos y escalado: cifras de `scripts/04_tecnicas_5_6_10.R` (Daniel) sobre la base de este
-script, pendientes de que Daniel las confirme.
+Formatos e incoherencias: cifras de `scripts/JEREMYSCRIPT.R` (Jeremy). Atípicos y escalado: cifras
+de `scripts/04_tecnicas_5_6_10.R` (Daniel) sobre la base de este script, pendientes de que Daniel
+las confirme.
 
 | Tipo de problema | Columna afectada | Cantidad | Descripción |
 |---|---|---|---|
 | Datos duplicados | Llave `ID_AMO`, `ID_TRIMESTRE`, `Consecutivo`, `ID_VIVIENDA`, `ID_HOGAR`, `ID_LINEA` | 0 | Sin duplicados exactos ni por llave. Sin `Consecutivo` la llave no es única, porque `ID_VIVIENDA` solo va de 1 a 12. |
-| Valores faltantes | `Ingreso_principal`, `Nivel_educativo`, `Amos_educacion` | 4 933 en ingreso; 7 en nivel; 7 en años | Ingreso: 1 160 con 99999999, 195 con 0, 2 994 vacíos y 584 auxiliares no remunerados (fuera de alcance). No respuesta real: 6,83 %. Educación: código 9 / 99 = "No especificado". |
+| Valores faltantes | `Ingreso_principal`, `Nivel_educativo`, `Amos_educacion` | 4 932 en ingreso; 7 en nivel; 7 en años | Ingreso: 1 160 con 99999999, 195 con 0, 2 993 vacíos y 584 auxiliares no remunerados (fuera de alcance). No respuesta real: 6,83 %. Educación: código 9 / 99 = "No especificado". |
 | Errores tipográficos | Etiquetas de `Educacion_titulo` | 1 etiqueta; 1 380 registros | "Maestria" sin tilde y categoría redundante "Maestría y doctorado" (código 6, sin registros). |
-| Formatos incorrectos | *[Pendiente TASK 02 — Jeremy]* | | |
+| Formatos incorrectos | Las 20 columnas conservadas (incluye `Edad`, `Sexo` e ingresos) | 20 de 20 columnas | Llegaron de SPSS como variables etiquetadas (14) o identificadores decimales (6). Se convirtieron a entero, numérico continuo o factor; no había decimales en columnas enteras ni montos negativos (0 casos). |
 | Codificación de variables categóricas | `Sexo`, `Nivel_educativo`, `Educacion_titulo`, `Edad` | 4 variables | Códigos numéricos de SPSS. El nivel educativo no distingue posgrado y el grupo de edad del INEC empieza en 15 años. |
-| Valores atípicos | `Ingreso_principal` | 5 680 por IQR (9,57 %); 783 por \|Z\| > 3 (1,32 %) | Fuera de [−168 750; 947 917] colones. Se marcan para revisión, no se eliminan. |
-| Normalización y escalado | `Ingreso_principal` | 59 339 valores | Asimetría positiva fuerte (g1 = 6,77); con ln(x) baja a −0,78. También se estandarizó con Z. |
-| Incoherencias lógicas | *[Pendiente TASK 02 — Jeremy]* | | |
-| Reducción de dimensionalidad | Conjunto completo (332 variables) | 313 descartadas | Se conservaron 19 variables: identificadores, demográficas, educativas, de actividad, ingreso y horas. |
+| Valores atípicos | `Ingreso_principal` | 5 679 por IQR (9,57 %); 783 por \|Z\| > 3 (1,32 %) | Fuera de [−168 750; 947 917] colones. Se marcan para revisión, no se eliminan. |
+| Normalización y escalado | `Ingreso_principal` | 59 334 valores | Asimetría positiva fuerte (g1 = 6,77); con ln(x) baja a −0,78. También se estandarizó con Z. |
+| Incoherencias lógicas | Ingresos, `Edad`, `Nivel_educativo`, `Educacion_titulo`, `Amos_educacion`, horas semanales | 6 registros | Seis reglas sobre los 64 279 ocupados de 18 a 65 años: nivel educativo incompatible con el título (1), años de educación mayores que edad − 4 (1) y más de 112 horas semanales (4). Neto mayor que bruto, total menor que principal y edad mínima para el título: 0 casos. Los 6 registros se descartaron. |
+| Reducción de dimensionalidad | Conjunto completo (332 variables) | 312 descartadas | Se conservaron 20 variables: identificadores, demográficas, educativas, de actividad, ingreso y horas. |
 
 ---
 
@@ -29,7 +30,7 @@ script, pendientes de que Daniel las confirme.
 
 ### Manejo de valores faltantes (Técnica 1)
 
-La población son 64 279 personas ocupadas de 18 a 65 años y la variable respuesta es
+La población son las 64 273 personas ocupadas de 18 a 65 años que deja TASK 02, y la variable respuesta es
 `Ingreso_principal` (ingreso mensual neto). El INEC marca la falta de dato con dos códigos:
 99999999 ("No especificado") y 0.
 
@@ -38,14 +39,14 @@ La población son 64 279 personas ocupadas de 18 a 65 años y la variable respue
 
 | Situación del ingreso | Casos | % |
 |---|---:|---:|
-| Válido (mayor que 0) | 59 346 | 92,33 |
-| Vacío en origen (asalariados) | 2 994 | 4,66 |
+| Válido (mayor que 0) | 59 341 | 92,33 |
+| Vacío en origen (asalariados) | 2 993 | 4,66 |
 | Código 99999999 | 1 160 | 1,80 |
 | Auxiliar no remunerado | 584 | 0,91 |
 | Código 0 (cuenta propia y empleadores) | 195 | 0,30 |
 
 Los auxiliares no remunerados trabajan sin pago: no es no respuesta, sino población fuera del
-análisis salarial. Sin ellos, la no respuesta es de **6,83 %** (4 349 de 63 695).
+análisis salarial. Sin ellos, la no respuesta es de **6,83 %** (4 348 de 63 689).
 
 **Tratamiento.** De las estrategias de T5 (Ramírez Benavides, s. f., diap. 6) se usó la
 eliminación por lista. Las demás se descartaron:
@@ -57,16 +58,16 @@ eliminación por lista. Las demás se descartaron:
 - **Regresión o k-NN:** predeciría el ingreso con sexo, edad y educación, justo la relación que se
   quiere estudiar.
 
-La pérdida es menor al 7 %. Por sexo la no respuesta es parecida (7,20 % hombres, 6,29 %
+La pérdida es menor al 7 %. Por sexo la no respuesta es parecida (7,20 % hombres, 6,28 %
 mujeres), pero baja con la escolaridad (9,95 % en "Ninguno", 5,08 % en "Universitario con
 título"). **Limitación:** la base limpia subrepresenta un poco a las personas con menos estudios.
 
 En educación, `Nivel_educativo` = 9 y `Amos_educacion` = 99 significan "No especificado" (7 casos
-cada uno). Se eliminaron los 7 de nivel educativo, por ser la variable explicativa principal; en
-años de educación el 99 pasó a `NA` sin eliminar filas. Los vacíos de `Educacion_titulo` no son
+cada uno), y son las mismas 7 personas. Se eliminaron por no tener nivel educativo, que es la
+variable explicativa principal; además, el 99 de años de educación se convierte a `NA`. Los vacíos de `Educacion_titulo` no son
 faltantes: esa pregunta solo se hace a quien tiene estudios postsecundarios.
 
-**Resultado:** −4 933 filas por ingreso y −7 por nivel educativo; quedan 59 339 personas.
+**Resultado:** −4 932 filas por ingreso y −7 por nivel educativo; quedan 59 334 personas.
 
 ### Corrección de errores tipográficos o inconsistencias (Técnica 2)
 
@@ -97,17 +98,17 @@ diap. 12). Se usaron las dos primeras, conservando las columnas originales:
   |---:|---|---:|
   | 0 | Ninguno | 914 |
   | 1 | Primaria incompleta | 4 178 |
-  | 2 | Primaria completa | 13 233 |
-  | 3 | Secundaria incompleta | 11 952 |
-  | 4 | Secundaria completa | 13 262 |
+  | 2 | Primaria completa | 13 232 |
+  | 3 | Secundaria incompleta | 11 951 |
+  | 4 | Secundaria completa | 13 261 |
   | 5 | Universitario sin título | 2 614 |
-  | 6 | Universitario con título de grado | 11 700 |
-  | 7 | Posgrado | 1 486 |
+  | 6 | Universitario con título de grado | 11 699 |
+  | 7 | Posgrado | 1 485 |
 
   Es ordinal y no *one-hot* porque el orden de los niveles es justo lo que se quiere relacionar
   con el salario.
 - **Grupo de edad:** el `Grupo_edad` del INEC empieza en 15 años, así que se creó
-  `Grupo_edad_estudio`: 18-24 (5 534), 25-34 (15 179), 35-49 (23 601) y 50-65 (15 025).
+  `Grupo_edad_estudio`: 18-24 (5 533), 25-34 (15 177), 35-49 (23 600) y 50-65 (15 024).
 
 ---
 

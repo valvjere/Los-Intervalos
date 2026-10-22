@@ -10,16 +10,21 @@ library(dplyr)
 library(purrr)
 library(stringr)
 
-df <- readRDS("data/procesados/ece_2024_2025_consolidado_crudo.rds")
-
-# Población de estudio: ocupados de 18 a 65 años
-df <- df %>%
-  filter(Condicion_actividad == 1, Edad >= 18, Edad <= 65, Sexo %in% c(1, 2))
+# Salida de TASK 02: población de estudio ya filtrada y con tipos validados
+df <- readRDS("data/procesados/ece_2024_2025_paso2_filtrado_tipos.rds")
 n_poblacion <- nrow(df)
+
+# TASK 02 quita las etiquetas de SPSS; se recuperan de los .sav originales
+archivos_sav <- list.files("data", pattern = "\\.sav$", full.names = TRUE)
+etiquetas_sav <- read_sav(archivos_sav[1], n_max = 1,
+                          col_select = c(Sexo, Nivel_educativo, Educacion_titulo))
+con_etiquetas <- function(x, variable) {
+  as_factor(labelled(as.numeric(as.character(x)), attr(etiquetas_sav[[variable]], "labels")))
+}
 
 # read_sav() convierte en NA los códigos 99999999 y 0; user_na = TRUE los conserva
 llave <- c("ID_AMO", "ID_TRIMESTRE", "Consecutivo", "ID_VIVIENDA", "ID_HOGAR", "ID_LINEA")
-df_sav <- list.files("data", pattern = "\\.sav$", full.names = TRUE) %>%
+df_sav <- archivos_sav %>%
   map_df(~ read_sav(.x, user_na = TRUE,
                     col_select = all_of(c(llave, "Ingreso_principal", "Posicion_empleo")))) %>%
   mutate(across(everything(), ~ as.numeric(unclass(.x)))) %>%
@@ -47,11 +52,11 @@ estado_ingreso <- count(df, Estado_ingreso)
 tasa_no_respuesta <- function(variable) {
   df %>%
     filter(Estado_ingreso != "Auxiliar no remunerado") %>%
-    group_by(Grupo = as_factor({{ variable }})) %>%
+    group_by(Grupo = con_etiquetas(.data[[variable]], variable)) %>%
     summarise(Tasa_pct = round(100 * mean(Estado_ingreso != "Válido"), 2))
 }
-no_respuesta_sexo  <- tasa_no_respuesta(Sexo)
-no_respuesta_nivel <- tasa_no_respuesta(Nivel_educativo)
+no_respuesta_sexo  <- tasa_no_respuesta("Sexo")
+no_respuesta_nivel <- tasa_no_respuesta("Nivel_educativo")
 
 # El ingreso es la variable respuesta: se elimina en vez de imputar
 df <- df %>% filter(Estado_ingreso == "Válido", Nivel_educativo != 9)
@@ -59,10 +64,10 @@ df <- df %>% filter(Estado_ingreso == "Válido", Nivel_educativo != 9)
 # ------------------------------------------------------------------------------
 # Técnica 2: Corrección de errores tipográficos en etiquetas
 # ------------------------------------------------------------------------------
-etiquetas_titulo <- attr(df$Educacion_titulo, "labels")
+etiquetas_titulo <- attr(etiquetas_sav$Educacion_titulo, "labels")
 names(etiquetas_titulo) <- str_squish(names(etiquetas_titulo)) %>%
   str_replace("^Maestria$", "Maestría")
-attr(df$Educacion_titulo, "labels") <- etiquetas_titulo
+df$Educacion_titulo <- labelled(as.numeric(df$Educacion_titulo), etiquetas_titulo)
 n_maestria <- sum(df$Educacion_titulo == 7, na.rm = TRUE)
 
 # ------------------------------------------------------------------------------
