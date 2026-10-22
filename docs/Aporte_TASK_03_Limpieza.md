@@ -1,22 +1,27 @@
 # Aporte TASK 03 — Faltantes, tipografía y codificación categórica
 
-Responsable: Lucas. Técnicas 1, 2 y 7 de T5. Texto listo para pegar en la plantilla
-`CI0115_PlantillaProyecto_LimpiezaDatos.docx`. Las cifras son las que imprime
-`scripts/03_faltantes_y_categorias.R` al terminar.
-
-> **Cifras preliminares.** Mientras no exista TASK 02 (Jeremy), el script aplica un filtro
-> poblacional provisional (ocupados, 18 a 65 años, sexo 1 o 2). Si TASK 02 elimina además
-> registros por incoherencias lógicas, hay que volver a correr el script y actualizar los números.
+Responsable: Lucas. Técnicas 1, 2 y 7 de T5. Las cifras salen de
+`scripts/03_faltantes_y_categorias.R`, que trabaja sobre la población de estudio (ocupados de
+18 a 65 años).
 
 ---
 
-## Sección 2 — Filas de la tabla de problemas identificados
+## Sección 2 — Tabla consolidada de problemas identificados
+
+Atípicos y escalado: cifras de `scripts/04_tecnicas_5_6_10.R` (Daniel) sobre la base de este
+script, pendientes de que Daniel las confirme.
 
 | Tipo de problema | Columna afectada | Cantidad | Descripción |
 |---|---|---|---|
-| Valores faltantes | `Ingreso_principal`, `Nivel_educativo`, `Amos_educacion` | 4 933 en ingreso; 7 en nivel educativo; 7 en años de educación | En ingreso: 1 160 con código 99999999 ("No especificado"), 195 con código 0, 2 994 sin dato en origen y 584 auxiliares no remunerados (sin salario por definición, fuera del alcance). Tasa de no respuesta real: 6,83 %. En educación, el código 9 / 99 significa "No especificado". |
-| Errores tipográficos | Etiquetas de `Educacion_titulo` | 1 etiqueta; 1 380 registros | Etiqueta "Maestria" sin tilde y categoría redundante "Maestría y doctorado" (código 6, sin registros) que se solapa con "Maestría" (7) y "Doctorado" (8). |
-| Codificación de variables categóricas | `Sexo`, `Nivel_educativo`, `Educacion_titulo`, `Edad` | 4 variables | Variables almacenadas como códigos numéricos de SPSS. El nivel educativo no distingue posgrado y el grupo de edad del INEC empieza en 15 años, por lo que no se ajusta a la población del estudio. |
+| Datos duplicados | Llave `ID_AMO`, `ID_TRIMESTRE`, `Consecutivo`, `ID_VIVIENDA`, `ID_HOGAR`, `ID_LINEA` | 0 | Sin duplicados exactos ni por llave. Sin `Consecutivo` la llave no es única, porque `ID_VIVIENDA` solo va de 1 a 12. |
+| Valores faltantes | `Ingreso_principal`, `Nivel_educativo`, `Amos_educacion` | 4 933 en ingreso; 7 en nivel; 7 en años | Ingreso: 1 160 con 99999999, 195 con 0, 2 994 vacíos y 584 auxiliares no remunerados (fuera de alcance). No respuesta real: 6,83 %. Educación: código 9 / 99 = "No especificado". |
+| Errores tipográficos | Etiquetas de `Educacion_titulo` | 1 etiqueta; 1 380 registros | "Maestria" sin tilde y categoría redundante "Maestría y doctorado" (código 6, sin registros). |
+| Formatos incorrectos | *[Pendiente TASK 02 — Jeremy]* | | |
+| Codificación de variables categóricas | `Sexo`, `Nivel_educativo`, `Educacion_titulo`, `Edad` | 4 variables | Códigos numéricos de SPSS. El nivel educativo no distingue posgrado y el grupo de edad del INEC empieza en 15 años. |
+| Valores atípicos | `Ingreso_principal` | 5 680 por IQR (9,57 %); 783 por \|Z\| > 3 (1,32 %) | Fuera de [−168 750; 947 917] colones. Se marcan para revisión, no se eliminan. |
+| Normalización y escalado | `Ingreso_principal` | 59 339 valores | Asimetría positiva fuerte (g1 = 6,77); con ln(x) baja a −0,78. También se estandarizó con Z. |
+| Incoherencias lógicas | *[Pendiente TASK 02 — Jeremy]* | | |
+| Reducción de dimensionalidad | Conjunto completo (332 variables) | 313 descartadas | Se conservaron 19 variables: identificadores, demográficas, educativas, de actividad, ingreso y horas. |
 
 ---
 
@@ -24,85 +29,69 @@ Responsable: Lucas. Técnicas 1, 2 y 7 de T5. Texto listo para pegar en la plant
 
 ### Manejo de valores faltantes (Técnica 1)
 
-La población de estudio son las 64 279 personas ocupadas de 18 a 65 años. La variable
-respuesta del proyecto es el ingreso mensual neto del empleo principal (`Ingreso_principal`).
-Según el diccionario oficial de la ECE, el INEC codifica la falta de dato en esta variable con
-dos valores reservados: 99999999 ("No especificado") y 0.
+La población son 64 279 personas ocupadas de 18 a 65 años y la variable respuesta es
+`Ingreso_principal` (ingreso mensual neto). El INEC marca la falta de dato con dos códigos:
+99999999 ("No especificado") y 0.
 
-Durante la exploración se detectó que la función `read_sav()` del paquete `haven` convierte
-estos códigos en `NA` sin avisar, lo que impide saber cuántos casos corresponden a cada uno.
-Por eso los archivos `.sav` se volvieron a leer con el argumento `user_na = TRUE`, que conserva
-los códigos originales. Además, se cruzó el ingreso con la variable `Posicion_empleo` para
-distinguir la no respuesta de la ausencia legítima de ingreso:
+`read_sav()` convierte esos códigos en `NA` sin avisar, así que los `.sav` se releyeron con
+`user_na = TRUE` para poder contarlos. Además, se cruzó el ingreso con `Posicion_empleo`:
 
-| Situación del ingreso | Casos | % de la población |
+| Situación del ingreso | Casos | % |
 |---|---:|---:|
 | Válido (mayor que 0) | 59 346 | 92,33 |
-| Sin dato en origen (asalariados) | 2 994 | 4,66 |
-| Código 99999999 "No especificado" | 1 160 | 1,80 |
-| Auxiliar no remunerado (fuera de alcance) | 584 | 0,91 |
+| Vacío en origen (asalariados) | 2 994 | 4,66 |
+| Código 99999999 | 1 160 | 1,80 |
+| Auxiliar no remunerado | 584 | 0,91 |
 | Código 0 (cuenta propia y empleadores) | 195 | 0,30 |
 
-Los 584 auxiliares no remunerados no son una no respuesta: trabajan sin recibir pago, por lo
-que su ingreso no existe y quedan fuera de un análisis salarial. Sin ellos, la tasa de no
-respuesta en ingreso es de **6,83 %** (4 349 de 63 695 personas).
+Los auxiliares no remunerados trabajan sin pago: no es no respuesta, sino población fuera del
+análisis salarial. Sin ellos, la no respuesta es de **6,83 %** (4 349 de 63 695).
 
-**Tratamiento.** Se eliminaron las filas sin ingreso utilizable (eliminación por lista). No se
-imputó, por dos razones. Primero, el ingreso es la variable que el proyecto busca explicar:
-imputarlo con la media o la mediana fabricaría salarios, reduciría artificialmente la varianza
-y alteraría la brecha que se quiere medir. Segundo, la pérdida es pequeña (menos del 7 %) y
-la muestra restante sigue siendo amplia.
+**Tratamiento.** De las estrategias de T5 (Ramírez Benavides, s. f., diap. 6) se usó la
+eliminación por lista. Las demás se descartaron:
 
-Para revisar si la eliminación introduce sesgo se comparó la tasa de no respuesta entre grupos.
-Por sexo es similar (hombres 7,20 %, mujeres 6,29 %). Por nivel educativo disminuye conforme
-aumenta la escolaridad (9,95 % en "Ninguno" frente a 5,08 % en "Universitario con título"). Esto
-se reporta como **limitación**: la base limpia subrepresenta levemente a las personas con menor
-escolaridad, lo que debe considerarse al interpretar la brecha por nivel educativo.
+- **Media, mediana o moda:** el ingreso es la variable a explicar; imputarlo inventa salarios,
+  reduce la varianza y altera la brecha.
+- **Valor constante:** solo aplica a variables categóricas.
+- **Interpolación:** es para series de tiempo, y cada registro es una persona en un trimestre.
+- **Regresión o k-NN:** predeciría el ingreso con sexo, edad y educación, justo la relación que se
+  quiere estudiar.
 
-En las variables educativas, el código 9 de `Nivel_educativo` y el 99 de `Amos_educacion`
-significan "No especificado" (7 casos en cada una). Como el nivel educativo es la variable
-explicativa principal, se eliminaron sus 7 casos. En `Amos_educacion`, el 99 se convirtió a `NA`
-sin eliminar filas, porque no es una variable central del análisis. Los vacíos de
-`Educacion_titulo` no son faltantes: la pregunta solo se aplica a quienes cursaron educación
-postsecundaria.
+La pérdida es menor al 7 %. Por sexo la no respuesta es parecida (7,20 % hombres, 6,29 %
+mujeres), pero baja con la escolaridad (9,95 % en "Ninguno", 5,08 % en "Universitario con
+título"). **Limitación:** la base limpia subrepresenta un poco a las personas con menos estudios.
 
-**Resultado:** se eliminaron 4 933 filas por ingreso no utilizable y 7 por nivel educativo no
-especificado. La población pasó de 64 279 a 59 339 personas.
+En educación, `Nivel_educativo` = 9 y `Amos_educacion` = 99 significan "No especificado" (7 casos
+cada uno). Se eliminaron los 7 de nivel educativo, por ser la variable explicativa principal; en
+años de educación el 99 pasó a `NA` sin eliminar filas. Los vacíos de `Educacion_titulo` no son
+faltantes: esa pregunta solo se hace a quien tiene estudios postsecundarios.
+
+**Resultado:** −4 933 filas por ingreso y −7 por nivel educativo; quedan 59 339 personas.
 
 ### Corrección de errores tipográficos o inconsistencias (Técnica 2)
 
-Los datos de la ECE vienen codificados numéricamente, por lo que el texto susceptible de errores
-son las etiquetas de valor de SPSS de las variables categóricas (`Sexo`, `Condicion_actividad`,
-`Nivel_educativo`, `Educacion_titulo`, `Grupo_edad` y `Posicion_empleo`). En la exploración se
-revisaron espacios sobrantes, ortografía y categorías que solo difieren en tildes o mayúsculas
-(por ejemplo, "Sí", "si" o "SÍ").
+Como los datos son numéricos, se revisaron las etiquetas de valor de `Sexo`,
+`Condicion_actividad`, `Nivel_educativo`, `Educacion_titulo`, `Grupo_edad` y `Posicion_empleo`,
+buscando espacios sobrantes, errores de ortografía y categorías que solo difieren en tildes o
+mayúsculas (Ramírez Benavides, s. f., diap. 7).
 
-El único error encontrado fue la etiqueta **"Maestria"** sin tilde (código 7 de
-`Educacion_titulo`, 1 380 registros). Se corrigió a "Maestría" directamente en las etiquetas de
-la variable, eliminando también espacios sobrantes con `str_squish()` del paquete `stringr`.
+- **"Maestria"** sin tilde (código 7 de `Educacion_titulo`, 1 380 registros): se corrigió a
+  "Maestría", y además se quitaron espacios sobrantes con `str_squish()`.
+- **Categoría redundante:** el código 6 "Maestría y doctorado" (esquema anterior) convive con
+  7 "Maestría" y 8 "Doctorado". No tiene registros en 2024-2025, así que se homologó sin perder
+  información.
 
-La revisión manual detectó además una **inconsistencia de categorías** en `Educacion_titulo`. La
-variable conserva el código 6 "Maestría y doctorado", de un esquema anterior, junto con los
-códigos 7 "Maestria" y 8 "Doctorado" del esquema vigente. Se verificó que el código 6 no tiene
-registros en el período 2024-2025, por lo que ambos esquemas se homologaron sin perder
-información.
-
-Se decidió no renombrar las columnas (por ejemplo, a minúsculas), porque los scripts del resto
-del equipo dependen de los nombres oficiales del INEC.
+No se renombraron columnas porque los scripts del equipo usan los nombres oficiales del INEC.
 
 ### Codificación de variables categóricas (Técnica 7)
 
-En los archivos `.sav` las variables categóricas son números con etiquetas (por ejemplo,
-1 = Hombre, 2 = Mujer). Se convirtieron a factores de R, conservando las columnas originales
-para trazabilidad:
+T5 presenta *one-hot*, *label encoding* y *binary/target encoding* (Ramírez Benavides, s. f.,
+diap. 12). Se usaron las dos primeras, conservando las columnas originales:
 
-- **Sexo:** factor nominal `Sexo_cat` (Hombre, Mujer) y variable binaria `Mujer`
-  (0 = Hombre, 1 = Mujer), útil para modelos posteriores.
-- **Nivel educativo:** codificación ordinal (*label encoding*) en `Nivel_educativo_ord` (0 a 7)
-  y factor ordenado `Nivel_educativo_cat`. La variable original del INEC llega solo hasta
-  "Universitario con título" y no distingue posgrado. Ese dato se tomó de `Educacion_titulo`
-  (5 = Especialización, 6 y 7 = Maestría, 8 = Doctorado), con lo que se obtuvo una escala de
-  ocho niveles:
+- **Sexo:** factor `Sexo_cat` (Hombre, Mujer) y binaria `Mujer` (0 = Hombre, 1 = Mujer).
+- **Nivel educativo:** entero ordinal `Nivel_educativo_ord` (0 a 7) y factor ordenado
+  `Nivel_educativo_cat`. El INEC no distingue posgrado en esta variable; se tomó de
+  `Educacion_titulo` (5 = Especialización, 6 y 7 = Maestría, 8 = Doctorado).
 
   | Orden | Nivel | Personas |
   |---:|---|---:|
@@ -115,20 +104,17 @@ para trazabilidad:
   | 6 | Universitario con título de grado | 11 700 |
   | 7 | Posgrado | 1 486 |
 
-  Se usó codificación ordinal y no *one-hot* porque los niveles tienen un orden natural, que es
-  justamente el que el proyecto quiere relacionar con el salario.
-- **Grupo de edad:** la variable `Grupo_edad` del INEC empieza en 15 años e incluye "60 y más",
-  por lo que no se ajusta al rango del estudio. Se creó `Grupo_edad_estudio`, un factor ordenado
-  con los tramos 18-24 (5 534), 25-34 (15 179), 35-49 (23 601) y 50-65 (15 025), sin sobrescribir
-  la variable original.
+  Es ordinal y no *one-hot* porque el orden de los niveles es justo lo que se quiere relacionar
+  con el salario.
+- **Grupo de edad:** el `Grupo_edad` del INEC empieza en 15 años, así que se creó
+  `Grupo_edad_estudio`: 18-24 (5 534), 25-34 (15 179), 35-49 (23 601) y 50-65 (15 025).
 
 ---
 
 ## Aporte a la Sección 4 — Herramientas utilizadas
 
-R 4.6.1 con los paquetes `haven` 2.5.5 (lectura de archivos SPSS conservando códigos de no
-respuesta), `dplyr` 1.2.1 (transformación de datos), `purrr` 1.2.2 (lectura de los ocho
-trimestres) y `stringr` 1.6.0 (limpieza de etiquetas de texto).
+R 4.6.1 con `haven` 2.5.5 (lectura de SPSS), `dplyr` 1.2.1 (transformación), `purrr` 1.2.2
+(lectura de los ocho trimestres) y `stringr` 1.6.0 (limpieza de etiquetas).
 
 ## Aporte a la Sección 6 — Referencias (APA 7)
 
