@@ -14,7 +14,6 @@
 
 # 1. Cargar librerías necesarias
 if (!requireNamespace("haven", quietly = TRUE)) install.packages("haven")
-if (!requireNamespace("tidyverse", quietly = TRUE)) install.packages("tidyverse")
 
 library(haven)      # Lectura nativa de archivos SPSS (.sav)
 library(dplyr)      # Manipulación y transformación de datos
@@ -75,7 +74,8 @@ variables_seleccionadas <- c(
   
   # Variables laborales complementarias
   "Horas_normales_principal",   # Horas habituales trabajadas por semana
-  "Horas_efectivas_principal"   # Horas efectivas trabajadas la semana anterior
+  "Horas_efectivas_principal",  # Horas efectivas trabajadas la semana anterior
+  "Ingreso_bruto_principal"     # Ingreso bruto mensual del empleo principal (regla neto <= bruto)
 )
 
 # 4. Función de ingesta modular con reporte individual

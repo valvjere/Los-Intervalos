@@ -22,7 +22,6 @@
 
 # 1. Librerías ------------------------------------------------------------------
 if (!requireNamespace("haven", quietly = TRUE)) install.packages("haven")
-if (!requireNamespace("tidyverse", quietly = TRUE)) install.packages("tidyverse")
 
 suppressPackageStartupMessages({
   library(haven)   # zap_labels(): quita metadatos de SPSS
